@@ -1,0 +1,15 @@
+{
+  "name": "libresedit.so",
+  "author": "gxost",
+  "displayName": "ResEdit",
+  "description": "Resource editor for Sky:CoTL",
+  "majorVersion": 1,
+  "minorVersion": 0,
+  "patchVersion": 0,
+  "displaysUI": true,
+  "selfManagedUI": true,
+  "githubReleasesUrl": "",
+  "dependencies": [
+
+  ]
+}

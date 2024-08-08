@@ -1,4 +1,5 @@
 #include "main_screen.hpp"
+#include "../resedit.hpp"
 
 namespace resedit::ui
 {

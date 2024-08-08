@@ -90,6 +90,11 @@ namespace modui::ui
 		return reinterpret_cast<Widget*>(this->_parent);
 	}
 
+	std::vector<Widget*>& Widget::get_children()
+	{
+		return this->_children;
+	}
+
 	Vec2 Widget::get_pos()
 	{
 		return this->_pos;

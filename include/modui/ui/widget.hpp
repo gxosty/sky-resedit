@@ -34,6 +34,7 @@ namespace modui::ui
 		Widget* find_widget_by_id(const std::string& id);
 
 		Widget* get_parent(); // ONLY ui::Widget*
+		std::vector<Widget*>& get_children();
 		Vec2 get_pos();
 
 		Widget* set_size(const Vec2& size);

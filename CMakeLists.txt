@@ -91,6 +91,12 @@ add_library( # Sets the name of the library.
 	resedit/resedit.cpp
 	resedit/resedit_app.cpp
 
+	# Core components
+	resedit/core/resource_pack_manager.cpp
+	resedit/core/resource_pack.cpp
+	resedit/core/replace_edit.cpp
+	resedit/core/json_edit.cpp
+
 	# Screens
 	resedit/ui/main_screen.cpp
 

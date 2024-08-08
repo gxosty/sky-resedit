@@ -1,0 +1,17 @@
+{
+	"name" : "Furry Classics",
+	"author" : "gxost",
+	"sky_version" : "any",
+	"edits" : [
+		{
+			"asset" : "Data/Resources/OutfitDefs.json",
+			"file" : "furryclassics.json",
+			"edit_type" : "json_replace_by_key",
+			"params" : {
+				"compare_key" : "name",
+				"path_to_object_in_asset" : "[]/",
+				"path_to_object_in_file" : "[]/"
+			}
+		}
+	]
+}

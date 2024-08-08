@@ -39,13 +39,13 @@ namespace resedit::core
 		//
 		// Returns:
 		//     (std::weak_ptr<ResourcePack>) A weak pointer to the resource pack at the specified index
-		std::weak_ptr<ResourcePack> get(size_t idx) const;
+		std::weak_ptr<ResourcePack> get(size_t idx) const { return _packs.at(idx); }
 
 		// Gets the number of resource packs in the manager
 		//
 		// Returns:
 		//     (size_t) The number of resource packs
-		size_t count() const;
+		size_t count() const { return _packs.size(); }
 
 		// Moves a resource pack within the manager
 		//
@@ -58,6 +58,6 @@ namespace resedit::core
 		int move(size_t idx, MoveDirection direction);
 
 	private:
-		std::vector<std::shared_ptr<ResourcePack>> _packs;
+		std::vector<std::shared_ptr<ResourcePack>> _packs; // Vector of resource packs
 	};
 }

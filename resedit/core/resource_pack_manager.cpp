@@ -30,17 +30,7 @@ namespace resedit::core
 			_packs.erase(_packs.begin() + idx);
 		}
 	}
-
-	std::weak_ptr<ResourcePack> ResourcePackManager::get(size_t idx) const
-	{
-		return _packs.at(idx);
-	}
-
-	size_t ResourcePackManager::count() const
-	{
-		return _packs.size();
-	}
-
+	
 	int ResourcePackManager::move(size_t idx, MoveDirection direction)
 	{
 		if (((direction == MoveDirection::Up) && (idx == (_packs.size() - 1)))

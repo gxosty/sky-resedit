@@ -5,6 +5,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <fstream>
+
 namespace resedit::core
 {
 	namespace fs = std::filesystem;
@@ -16,11 +18,29 @@ namespace resedit::core
 		if (!fs::exists(metadata_path))
 			throw exceptions::ResourcePackMissingMetadata(resource_pack_path);
 
-		nlohmann::json metadata(metadata_path);
+		std::ifstream metadata_file(metadata_path);
+
+		if (!metadata_file.is_open())
+			throw std::runtime_error("Cannot open file: " + metadata_path.string());
+
+		nlohmann::json metadata;
+		metadata_file >> metadata;
+		metadata_file.close();
 
 		_name = metadata.value("name", RESEDIT_RESOURCE_PACK_DEFAULT_NAME);
 		_author = metadata.value("author", RESEDIT_RESOURCE_PACK_DEFAULT_AUTHOR);
-		_sky_version = metadata.value("sky_version", 0);
+
+		if (metadata.contains("sky_version") && metadata["sky_version"].is_string())
+		{
+			if (metadata["sky_version"].get<std::string>() != "any")
+				throw std::runtime_error("Wrong `sky_version` value in metadata. Should be \"any\" or sky build number");
+
+			_sky_version = 0;
+		}
+		else
+		{
+			_sky_version = metadata.value("sky_version", 0);
+		}
 
 		if (!metadata.contains("edits")) return;
 

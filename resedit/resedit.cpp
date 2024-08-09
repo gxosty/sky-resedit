@@ -5,9 +5,12 @@
 #include <misc/Logger.h>
 
 #include <future>
+#include <filesystem>
 
 namespace resedit
 {
+	namespace fs = std::filesystem;
+
 	core::ResourcePackManager _resource_pack_manager;
 	CipherBase* _vfs_readfile_cipher_hook = nullptr;
 	std::promise<void> _vfs_readfile_promise;
@@ -26,6 +29,11 @@ namespace resedit
 			max_len,
 			&written_len
 		};
+
+		if (_resource_pack_manager.handle_asset(asset_data))
+		{
+			LOGI("Modified: %s", *(const char**)this_);
+		}
 
 		return written_len;
 	}

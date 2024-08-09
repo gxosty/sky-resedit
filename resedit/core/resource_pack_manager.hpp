@@ -30,6 +30,12 @@ namespace resedit::core
 		// Removes a resource pack from the manager
 		//
 		// Args:
+		//     idx: (size_t) The index of the resource pack
+		void remove(size_t idx);
+
+		// Removes a resource pack from the manager
+		//
+		// Args:
 		//     resource_pack: (std::weak_ptr<ResourcePack>) The resource pack to remove
 		void remove(std::weak_ptr<ResourcePack> resource_pack);
 
@@ -42,6 +48,15 @@ namespace resedit::core
 		//     (std::weak_ptr<ResourcePack>) A weak pointer to the resource pack at the specified index
 		std::weak_ptr<ResourcePack> get(size_t idx) const { return _packs.at(idx); }
 
+		// Gets a resource pack index by its pointer
+		//
+		// Args:
+		//     resource_pack: (std::weak_ptr<ResourcePack>) The resource pack to get the index of
+		//
+		// Returns:
+		//     (size_t) The index of the resource pack
+		size_t get_index(std::weak_ptr<ResourcePack> resource_pack) const;
+
 		// Gets the number of resource packs in the manager
 		//
 		// Returns:
@@ -51,12 +66,22 @@ namespace resedit::core
 		// Moves a resource pack within the manager
 		//
 		// Args:
+		//     resource_pack: (std::weak_ptr<ResourcePack>) The resource pack to move
+		//     direction: (MoveDirection) The direction to move the resource pack (Up or Down)
+		//
+		// Returns:
+		//     (size_t) The new index of the moved resource pack
+		size_t move(size_t idx, MoveDirection direction);
+
+		// Moves a resource pack within the manager
+		//
+		// Args:
 		//     idx: (size_t) The index of the resource pack to move
 		//     direction: (MoveDirection) The direction to move the resource pack (Up or Down)
 		//
 		// Returns:
-		//     (int) The new index of the moved resource pack
-		int move(size_t idx, MoveDirection direction);
+		//     (size_t) The new index of the moved resource pack
+		size_t move(std::weak_ptr<ResourcePack> resource_pack, MoveDirection direction);
 
 		// Passes asset data to resource packs for editing
 		//

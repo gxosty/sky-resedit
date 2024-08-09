@@ -9,29 +9,38 @@ namespace resedit::core
 		return _packs.emplace_back(std::make_shared<ResourcePack>(resource_pack_path));
 	}
 
-	void ResourcePackManager::remove(std::weak_ptr<ResourcePack> resource_pack)
+	size_t ResourcePackManager::get_index(std::weak_ptr<ResourcePack> resource_pack) const
 	{
-		size_t idx = -1;
-
 		if (auto a_pack = resource_pack.lock())
 		{
 			for (size_t i = 0; i < _packs.size(); i++)
 			{
 				if (a_pack == _packs[i])
 				{
-					idx = i;
-					break;
+					return i;
 				}
 			}
 		}
 
+		return -1;
+	}
+
+	void ResourcePackManager::remove(size_t idx)
+	{
+		_packs.erase(_packs.begin() + idx);
+	}
+
+	void ResourcePackManager::remove(std::weak_ptr<ResourcePack> resource_pack)
+	{
+		size_t idx = this->get_index(resource_pack);
+
 		if (idx != -1)
 		{
-			_packs.erase(_packs.begin() + idx);
+			this->remove(idx);
 		}
 	}
 	
-	int ResourcePackManager::move(size_t idx, MoveDirection direction)
+	size_t ResourcePackManager::move(size_t idx, MoveDirection direction)
 	{
 		if (((direction == MoveDirection::Up) && (idx == (_packs.size() - 1)))
 			|| ((direction == MoveDirection::Down) && (idx == 0)))
@@ -46,6 +55,18 @@ namespace resedit::core
 		_packs[new_idx] = std::move(pack);
 
 		return new_idx;
+	}
+
+	size_t ResourcePackManager::move(std::weak_ptr<ResourcePack> resource_pack, MoveDirection direction)
+	{
+		size_t idx = this->get_index(resource_pack);
+
+		if (idx != -1)
+		{
+			return this->move(idx, direction);
+		}
+
+		return idx;
 	}
 
 	bool ResourcePackManager::handle_asset(const AssetData& asset_data)

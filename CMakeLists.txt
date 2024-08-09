@@ -88,8 +88,10 @@ add_library( # Sets the name of the library.
 	SHARED
 	
 	resedit/main.cpp
+	resedit/config.cpp
 	resedit/resedit.cpp
 	resedit/resedit_app.cpp
+	resedit/resedit_io.cpp
 
 	# Core components
 	resedit/core/resource_pack_manager.cpp

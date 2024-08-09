@@ -62,7 +62,7 @@ namespace resedit::core
 
 		for (auto& edit : _edits)
 		{
-			if (edit->matches(asset_data.path))
+			if (edit->matches(asset_data.path) && !edit->is_applied())
 			{
 				edit->apply(asset_data);
 				is_modified = true;

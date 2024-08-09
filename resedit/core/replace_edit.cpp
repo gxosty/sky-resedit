@@ -23,5 +23,7 @@ namespace resedit::core
 		asset_data.written_len[0] = file.gcount();
 
 		file.close();
+
+		_is_applied = true;
 	}
 }

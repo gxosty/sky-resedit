@@ -50,7 +50,7 @@ namespace resedit::core
 
 	bool ResourcePackManager::handle_asset(const AssetData& asset_data)
 	{
-		if (_packs.empty()) return;
+		if (_packs.empty()) return false;
 
 		bool is_modified = false;
 

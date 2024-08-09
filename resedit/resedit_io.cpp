@@ -16,6 +16,11 @@ namespace resedit::io
 		return fs::path(Cipher::getConfigPath()) / RESEDIT_BASE_DIR_NAME;
 	}
 
+	fs::path get_base_path()
+	{
+		return _get_base_directory();
+	}
+
 	fs::path get_config_path()
 	{
 		return _get_base_directory() / RESEDIT_CONFIG_FILE_NAME;

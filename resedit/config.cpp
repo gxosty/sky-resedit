@@ -70,6 +70,6 @@ namespace resedit
 
 	void Config::remove_resource_pack_id(size_t idx)
 	{
-		_config["pack_idx"].erase(_config["pack_ids"].begin() + idx);
+		_config["pack_ids"].erase(_config["pack_ids"].begin() + idx);
 	}
 }

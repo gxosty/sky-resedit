@@ -84,6 +84,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 add_subdirectory(include/minizip)
+add_compile_definitions(MODUI_EMBED_ICONS=1)
 
 add_library( # Sets the name of the library.
 	${CUR_NAME}
@@ -104,6 +105,9 @@ add_library( # Sets the name of the library.
 
 	# Screens
 	resedit/ui/main_screen.cpp
+
+	# Widgets
+	resedit/ui/widgets/resource_pack_card.cpp
 
 	# ModUI
 	include/stb/stb_image.cpp

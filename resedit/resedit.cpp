@@ -21,7 +21,7 @@ namespace resedit
 	ImportResult _last_import_result = ImportResult::None;
 	std::string _last_error_message{""};
 
-	std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> _imported_callback;
+	std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> _imported_callback = [](std::weak_ptr<core::ResourcePack>, ImportResult){};
 
 	Config _config(io::get_config_path());
 	core::ResourcePackManager _resource_pack_manager;
@@ -74,7 +74,7 @@ namespace resedit
 
 	void initialize()
 	{
-		uintptr_t vfs_readfile_addr = CipherUtils::CipherScanPattern("", Flags::ReadAndExecute);
+		uintptr_t vfs_readfile_addr = CipherUtils::CipherScanPattern("FD 7B BE A9 FC 4F 01 A9 FD 03 00 91 FF 03 08 D1 03 14 40 F9 F3 03 00 AA 7F 00 02 EB 28 02 00 54", Flags::ReadAndExecute);
 
 		if (vfs_readfile_addr)
 		{
@@ -84,6 +84,11 @@ namespace resedit
 				->set_Address(Cipher::get_libBase() + 0x1AA171C, false)
 				->Fire();
 		}
+
+		fs::path base_path = io::get_base_path();
+
+		if (!fs::is_directory(base_path))
+			fs::create_directory(base_path);
 
 		_initialize_resource_packs();
 
@@ -155,10 +160,7 @@ namespace resedit
 
 		_clear_temp_dir();
 
-		if (_imported_callback.target<void(std::weak_ptr<core::ResourcePack>, ImportResult)>() != nullptr)
-		{
-			_imported_callback(resource_pack, _last_import_result);
-		}
+		_imported_callback(resource_pack, _last_import_result);
 	}
 
 	void import_resource_pack()
@@ -171,17 +173,27 @@ namespace resedit
 		return _last_import_result;
 	}
 
-	void set_import_resource_pack_callback(std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> callback)
+	void set_import_callback(std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> callback)
 	{
 		_imported_callback = callback;
 	}
 
 	void remove_resource_pack(std::weak_ptr<core::ResourcePack> resource_pack)
 	{
+		fs::path resource_pack_path{"/"};
+
+		if (auto rp = resource_pack.lock())
+		{
+			resource_pack_path = rp->get_path();
+		}
+
 		size_t idx = _resource_pack_manager.get_index(resource_pack);
 		_resource_pack_manager.remove(resource_pack);
 		_config.remove_resource_pack_id(idx);
 		_config.save();
+
+		if (fs::exists(resource_pack_path / RESEDIT_RESOURCE_PACK_METADATA_FILENAME))
+			fs::remove_all(resource_pack_path);
 	}
 
 	bool move_resource_pack(std::weak_ptr<core::ResourcePack> resource_pack, core::ResourcePackManager::MoveDirection direction)

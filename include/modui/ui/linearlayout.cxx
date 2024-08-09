@@ -224,6 +224,7 @@ namespace modui::ui
 			}
 		}
 
+		this->_calculated_size.x = fmax(this->_calculated_size.x, 1.0f);
 		return this->_calculated_size.x;
 	}
 
@@ -335,6 +336,7 @@ namespace modui::ui
 			}
 		}
 
+		this->_calculated_size.y = fmax(this->_calculated_size.y, 1.0f);
 		return this->_calculated_size.y;
 	}
 }

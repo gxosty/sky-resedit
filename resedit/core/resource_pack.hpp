@@ -55,7 +55,10 @@ namespace resedit::core
 		//
 		// Args:
 		//     asset_data: (const AssetData&) The asset data to handle
-		void handle(const AssetData& asset_data);
+		//
+		// Returns:
+		//     (bool) `true` if asset was edited/modified, `false` otherwise
+		bool handle(const AssetData& asset_data);
 
 	private:
 		// Adds an edit to the resource pack

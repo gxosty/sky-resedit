@@ -56,13 +56,24 @@ namespace resedit::core
 		}
 	}
 
-	void ResourcePack::handle(const AssetData& asset_data)
+	bool ResourcePack::handle(const AssetData& asset_data)
 	{
-		return;
+		bool is_modified = false;
+
+		for (auto& edit : _edits)
+		{
+			if (edit->matches(asset_data.path))
+			{
+				edit->apply(asset_data);
+				is_modified = true;
+			}
+		}
+
+		return is_modified;
 	}
 
 	void ResourcePack::add_edit(std::unique_ptr<Edit> edit)
 	{
-		this->_edits.push_back(std::move(edit));
+		_edits.push_back(std::move(edit));
 	}
 }

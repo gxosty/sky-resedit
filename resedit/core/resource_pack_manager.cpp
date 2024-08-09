@@ -47,4 +47,16 @@ namespace resedit::core
 
 		return new_idx;
 	}
+
+	bool ResourcePackManager::handle_asset(const AssetData& asset_data)
+	{
+		bool is_modified = false;
+
+		for (auto pack_it = _packs.begin(); pack_it < _packs.end(); pack_it++)
+		{
+			is_modified = (*pack_it)->handle(asset_data);
+		}
+
+		return is_modified;
+	}
 }

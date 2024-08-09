@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.hpp"
 #include "resource_pack.hpp"
 
 #include <vector>
@@ -56,6 +57,15 @@ namespace resedit::core
 		// Returns:
 		//     (int) The new index of the moved resource pack
 		int move(size_t idx, MoveDirection direction);
+
+		// Passes asset data to resource packs for editing
+		//
+		// Args:
+		//     asset_data: (const AssetData&) The asset data to be edited
+		//
+		// Returns:
+		//     (bool) `true` if asset was edited/modified, `false` otherwise
+		bool handle_asset(const AssetData& asset_data);
 
 	private:
 		std::vector<std::shared_ptr<ResourcePack>> _packs; // Vector of resource packs

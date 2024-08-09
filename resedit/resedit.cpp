@@ -1,20 +1,31 @@
+#include "core/common.hpp"
 #include "resedit.hpp"
+#include "config.hpp"
+#include "resedit_io.hpp"
+#include "utils.hpp"
 
 #include <Cipher/Cipher.h>
 #include <Cipher/CipherUtils.h>
 #include <misc/Logger.h>
+#include <fileselector/fileselector.h>
 
 #include <future>
 #include <filesystem>
+#include <unistd.h>
 
 namespace resedit
 {
 	namespace fs = std::filesystem;
 
 	State _state = State::NotInitialized;
-	std::function<void(State)> state_change_callback;
+	ImportResult _last_import_result = ImportResult::None;
+	std::string _last_error_message{""};
 
+	std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> _imported_callback;
+
+	Config _config(io::get_config_path());
 	core::ResourcePackManager _resource_pack_manager;
+	
 	CipherBase* _vfs_readfile_cipher_hook = nullptr;
 	std::promise<void> _vfs_readfile_promise;
 	std::future<void> _vfs_readfile_future = _vfs_readfile_promise.get_future();
@@ -44,16 +55,21 @@ namespace resedit
 	void _set_state(State state)
 	{
 		_state = state;
-
-		if (state_change_callback.target<void(State)>())
-		{
-			state_change_callback(_state);
-		}
 	}
 
 	State get_state()
 	{
 		return _state;
+	}
+
+	void _initialize_resource_packs()
+	{
+		for (size_t idx = 0; idx < _config.get_resource_pack_count(); idx++)
+		{
+			std::string pack_id = _config.get_resource_pack_id(idx);
+			fs::path resource_pack_path = io::get_resource_pack_path(pack_id);
+			_resource_pack_manager.create(resource_pack_path);
+		}
 	}
 
 	void initialize()
@@ -69,7 +85,7 @@ namespace resedit
 				->Fire();
 		}
 
-
+		_initialize_resource_packs();
 
 		if (!vfs_readfile_addr)
 		{
@@ -81,14 +97,91 @@ namespace resedit
 		_vfs_readfile_promise.set_value();
 	}
 
+	void _clear_temp_dir()
+	{
+		fs::remove_all(io::get_temp_directory_path());
+	}
+
+	void _import_resource_pack(int fd)
+	{
+		_last_import_result = ImportResult::None;
+		std::weak_ptr<core::ResourcePack> resource_pack;
+
+		size_t file_size = lseek(fd, 0, SEEK_END);
+		lseek(fd, 0, SEEK_SET);
+		char buffer[file_size + 1];
+		read(fd, buffer, file_size);
+		close(fd);
+
+		fs::path temp_dir = io::get_temp_directory_path();
+		fs::path temp_file_path = temp_dir / "temp.zip";
+
+		if (!fs::is_directory(temp_dir))
+			fs::create_directory(temp_dir);
+
+		FILE* temp_file = fopen(temp_file_path.string().c_str(), "w");
+		fwrite(buffer, 1, file_size, temp_file);
+		fclose(temp_file);
+
+		try
+		{
+			// Extract metadata to temporary directory
+			utils::extract_file_from_zip(temp_file_path, RESEDIT_RESOURCE_PACK_METADATA_FILENAME, temp_dir);
+			fs::path metadata_path = temp_dir / RESEDIT_RESOURCE_PACK_METADATA_FILENAME;
+
+			// Try creating temporary resource pack to see if metadata is correct
+			core::ResourcePack temp_resource_pack(temp_dir);
+
+			// Create new ID for resource pack
+			std::string pack_id = utils::get_time_in_seconds_as_string();
+
+			// Get resource pack's path
+			fs::path resource_pack_path = io::get_resource_pack_path(pack_id);
+			fs::create_directories(resource_pack_path);
+
+			utils::extract_zip(temp_file_path, resource_pack_path);
+
+			_config.add_resource_pack_id(pack_id);
+			_config.save();
+			resource_pack = _resource_pack_manager.create(resource_pack_path);
+
+			_last_import_result = ImportResult::Imported;
+		}
+		catch (const std::runtime_error& error)
+		{
+			_last_import_result = ImportResult::NotImported;
+			_last_error_message = std::string(error.what());
+		}
+
+		_clear_temp_dir();
+
+		if (_imported_callback.target<void(std::weak_ptr<core::ResourcePack>, ImportResult)>() != nullptr)
+		{
+			_imported_callback(resource_pack, _last_import_result);
+		}
+	}
+
 	void import_resource_pack()
 	{
+		requestFile("application/zip", _import_resource_pack, false);
+	}
 
+	ImportResult get_last_import_result()
+	{
+		return _last_import_result;
+	}
+
+	void set_import_resource_pack_callback(std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> callback)
+	{
+		_imported_callback = callback;
 	}
 
 	void remove_resource_pack(std::weak_ptr<core::ResourcePack> resource_pack)
 	{
+		size_t idx = _resource_pack_manager.get_index(resource_pack);
 		_resource_pack_manager.remove(resource_pack);
+		_config.remove_resource_pack_id(idx);
+		_config.save();
 	}
 
 	bool move_resource_pack(std::weak_ptr<core::ResourcePack> resource_pack, core::ResourcePackManager::MoveDirection direction)
@@ -96,7 +189,15 @@ namespace resedit
 		size_t idx = _resource_pack_manager.get_index(resource_pack);
 		size_t new_idx = _resource_pack_manager.move(idx, direction);
 
-		return idx != new_idx;
+		bool pack_moved = idx != new_idx;
+
+		if (pack_moved)
+		{
+			_config.move_resource_pack_id(idx, new_idx);
+			_config.save();
+		}
+
+		return pack_moved;
 	}
 
 	size_t get_resource_pack_count()

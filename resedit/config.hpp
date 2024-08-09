@@ -20,6 +20,7 @@ namespace resedit
 		std::string get_resource_pack_id(size_t idx);
 		void add_resource_pack_id(const std::string& pack_id);
 		void move_resource_pack_id(size_t idx, size_t new_idx);
+		void remove_resource_pack_id(size_t idx);
 
 	private:
 		std::filesystem::path _config_path;

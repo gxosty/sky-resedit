@@ -83,6 +83,8 @@ add_compile_definitions(__LIB_VERSION__="${LIB_VERSION}") # You can use lib_vers
 include_directories(${CMAKE_SOURCE_DIR}/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
+add_subdirectory(include/minizip)
+
 add_library( # Sets the name of the library.
 	${CUR_NAME}
 	SHARED
@@ -92,6 +94,7 @@ add_library( # Sets the name of the library.
 	resedit/resedit.cpp
 	resedit/resedit_app.cpp
 	resedit/resedit_io.cpp
+	resedit/utils.cpp
 
 	# Core components
 	resedit/core/resource_pack_manager.cpp
@@ -147,6 +150,8 @@ target_link_libraries(
 
 	EGL
 	GLESv3
+
+	minizip
 )
 
 add_custom_command(

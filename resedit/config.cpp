@@ -61,8 +61,15 @@ namespace resedit
 
 	void Config::move_resource_pack_id(size_t idx, size_t new_idx)
 	{
+		// I know there is more simpler way but meh
+
 		std::string pack_id = _config["pack_ids"][idx].get<std::string>();
 		_config["pack_ids"].erase(_config["pack_ids"].begin() + idx);
 		_config["pack_ids"].insert(_config["pack_ids"].begin() + new_idx, pack_id);
+	}
+
+	void Config::remove_resource_pack_id(size_t idx)
+	{
+		_config["pack_idx"].erase(_config["pack_ids"].begin() + idx);
 	}
 }

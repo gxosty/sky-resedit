@@ -60,10 +60,7 @@ namespace resedit::ui::widgets
 					Widget::init(),
 
 					OutlinedIconButton::init(modui::icons::ic_delete_outline)
-						->set_id("pack_delete_ib")
-						->on_release(MODUI_CALLBACK(this) {
-							((ResEditApp*)modui::get_current_app())->remove_resource_pack(this);
-						}),
+						->set_id("pack_delete_ib"),
 
 					FilledIconButton::init(modui::icons::ic_arrow_down)
 						->set_id("pack_move_down_ib"),

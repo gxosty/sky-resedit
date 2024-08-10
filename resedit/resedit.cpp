@@ -81,7 +81,7 @@ namespace resedit
 			_vfs_readfile_cipher_hook = (new CipherHook())
 				->set_Hook((uintptr_t)_vfs_readfile_hook)
 				->set_Callback((uintptr_t)&_vfs_readfile_orig)
-				->set_Address(Cipher::get_libBase() + 0x1AA171C, false)
+				->set_Address(vfs_readfile_addr, false)
 				->Fire();
 		}
 

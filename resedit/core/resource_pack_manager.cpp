@@ -42,8 +42,8 @@ namespace resedit::core
 	
 	size_t ResourcePackManager::move(size_t idx, MoveDirection direction)
 	{
-		if (((direction == MoveDirection::Up) && (idx == (_packs.size() - 1)))
-			|| ((direction == MoveDirection::Down) && (idx == 0)))
+		if (((direction == MoveDirection::Up) && (idx == 0))
+			|| ((direction == MoveDirection::Down) && (idx == (_packs.size() - 1))))
 		{
 			return idx;
 		}

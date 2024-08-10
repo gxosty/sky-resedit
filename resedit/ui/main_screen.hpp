@@ -16,6 +16,7 @@ namespace resedit::ui
 
 		void add_resource_pack(std::weak_ptr<resedit::core::ResourcePack> resource_pack, size_t index);
 		void remove_resource_pack(ui::widgets::ResourcePackCard* resource_pack_card);
+		void move_resource_pack(ui::widgets::ResourcePackCard* resource_pack_card, core::ResourcePackManager::MoveDirection direction);
 
 	private:
 		void on_create_widget() override;

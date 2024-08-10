@@ -122,7 +122,7 @@ namespace modui::ui
 
 		if (this->_orientation == Orientation::HORIZONTAL)
 		{
-			unsigned widget_count = this->_children.size();
+			int widget_count = this->_children.size();
 			unsigned widget_full_width_count = 0;
 			float inner_width_widgets = 0.0f;
 			float widget_full_width = 0.0f;
@@ -224,7 +224,6 @@ namespace modui::ui
 			}
 		}
 
-		this->_calculated_size.x = fmax(this->_calculated_size.x, 1.0f);
 		return this->_calculated_size.x;
 	}
 
@@ -234,7 +233,7 @@ namespace modui::ui
 
 		if (this->_orientation == Orientation::VERTICAL)
 		{
-			unsigned widget_count = this->_children.size();
+			int widget_count = this->_children.size();
 			unsigned widget_full_height_count = 0;
 			float inner_height_widgets = 0.0f;
 			float widget_full_height = 0.0f;
@@ -336,7 +335,6 @@ namespace modui::ui
 			}
 		}
 
-		this->_calculated_size.y = fmax(this->_calculated_size.y, 1.0f);
 		return this->_calculated_size.y;
 	}
 }

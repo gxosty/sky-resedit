@@ -56,6 +56,8 @@ namespace resedit
 	//     (bool) `true` if the resource pack was moved successfully, `false` otherwise.
 	bool move_resource_pack(std::weak_ptr<core::ResourcePack> resource_pack, core::ResourcePackManager::MoveDirection direction);
 
+	void set_resource_pack_enabled(std::weak_ptr<core::ResourcePack> resource_pack, bool enabled);
+
 	// Gets the number of loaded resource packs.
 	//
 	// Returns:

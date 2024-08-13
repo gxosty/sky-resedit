@@ -8,8 +8,9 @@ namespace resedit::core
 {
 	ReplaceEdit::ReplaceEdit(
 		const std::string& asset_path,
-		const std::filesystem::path& file_path
-	) : Edit(asset_path, file_path) {}
+		const std::filesystem::path& file_path,
+		int repeat
+	) : Edit(asset_path, file_path, repeat) {}
 
 	void ReplaceEdit::apply(const AssetData& asset_data)
 	{
@@ -24,6 +25,7 @@ namespace resedit::core
 
 		file.close();
 
-		_is_applied = true;
+		if (!--_repeat)
+			_is_applied = true;
 	}
 }

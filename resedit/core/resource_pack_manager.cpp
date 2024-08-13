@@ -77,7 +77,8 @@ namespace resedit::core
 
 		for (auto pack_it = _packs.end() - 1; pack_it >= _packs.begin(); pack_it--)
 		{
-			is_modified = (*pack_it)->handle(asset_data);
+			if ((*pack_it)->is_enabled())
+				is_modified = (*pack_it)->handle(asset_data);
 		}
 
 		return is_modified;

@@ -11,7 +11,7 @@ namespace resedit::core
 {
 	namespace fs = std::filesystem;
 
-	ResourcePack::ResourcePack(const std::filesystem::path& resource_pack_path) : _path{resource_pack_path}
+	ResourcePack::ResourcePack(const std::filesystem::path& resource_pack_path) : _path{resource_pack_path}, _enabled{true}
 	{
 		fs::path metadata_path = resource_pack_path / RESEDIT_RESOURCE_PACK_METADATA_FILENAME;
 
@@ -29,6 +29,8 @@ namespace resedit::core
 
 		_name = metadata.value("name", RESEDIT_RESOURCE_PACK_DEFAULT_NAME);
 		_author = metadata.value("author", RESEDIT_RESOURCE_PACK_DEFAULT_AUTHOR);
+		_description = metadata.value("description", RESEDIT_RESOURCE_PACK_DEFAULT_DESCRIPTION);
+		_version = metadata.value("version", RESEDIT_RESOURCE_PACK_DEFAULT_VERSION);
 
 		if (metadata.contains("sky_version") && metadata["sky_version"].is_string())
 		{
@@ -49,13 +51,14 @@ namespace resedit::core
 			try {
 				std::string asset = edit_info["asset"].get<std::string>();
 				std::string file = edit_info["file"].get<std::string>();
+				int repeat = edit_info.value("repeat", 1);
 				std::string edit_type_str = edit_info["edit_type"];
 
 				fs::path file_path = resource_pack_path / file;
 
 				if (edit_type_str == "replace")
 				{
-					std::unique_ptr<Edit> edit = std::make_unique<ReplaceEdit>(asset, file_path);
+					std::unique_ptr<Edit> edit = std::make_unique<ReplaceEdit>(asset, file_path, repeat);
 					this->add_edit(std::move(edit));
 				}
 				else if (edit_type_str == "json_replace_by_key")
@@ -65,7 +68,7 @@ namespace resedit::core
 					std::string path_to_object_in_file = edit_info["path_to_object_in_file"].get<std::string>();
 
 					std::unique_ptr<Edit> edit =
-						std::make_unique<JsonReplaceByKeyEdit>(asset, file_path, compare_key, path_to_object_in_asset, path_to_object_in_file);
+						std::make_unique<JsonReplaceByKeyEdit>(asset, file_path, repeat, compare_key, path_to_object_in_asset, path_to_object_in_file);
 
 					this->add_edit(std::move(edit));
 				}
@@ -74,6 +77,11 @@ namespace resedit::core
 				throw exceptions::ResourcePackInvalidEdit(_name, std::stoi(idx_str));
 			}
 		}
+	}
+
+	void ResourcePack::set_enabled(bool enabled)
+	{
+		_enabled = enabled;
 	}
 
 	bool ResourcePack::handle(const AssetData& asset_data)

@@ -31,9 +31,17 @@ namespace resedit::ui
 
 	void MainScreen::remove_resource_pack(ui::widgets::ResourcePackCard* resource_pack_card)
 	{
+		size_t idx = resource_pack_card->get_index();
 		auto rp_holder_ll = this->find_widget_by_id("rp_holder_ll");
-
 		rp_holder_ll->remove(resource_pack_card);
+		delete resource_pack_card;
+
+		std::vector<modui::ui::Widget*>& ll_children = rp_holder_ll->get_children();
+
+		for (; idx < ll_children.size(); idx++)
+		{
+			((ui::widgets::ResourcePackCard*)ll_children[idx])->set_index(idx);
+		}
 	}
 
 	void MainScreen::move_resource_pack(ui::widgets::ResourcePackCard* resource_pack_card, core::ResourcePackManager::MoveDirection direction)
@@ -49,6 +57,10 @@ namespace resedit::ui
 				auto w = ll_children[i];
 				ll_children[i] = ll_children[new_idx];
 				ll_children[new_idx] = w;
+
+				((ui::widgets::ResourcePackCard*)ll_children[i])->set_index(i);
+				resource_pack_card->set_index(new_idx);
+
 				break;
 			}
 		}
@@ -67,7 +79,7 @@ namespace resedit::ui
 					TitleText::init("ResEdit v" __LIB_VERSION__)
 						->set_padding_bottom(DP(5)),
 
-					Text::init("Restart is required for resource packs to take effect"),
+					Text::init("Restart is required for changes to take effect"),
 
 					Button::init("Add Resource Pack")
 						->set_size_x(MODUI_SIZE_WIDTH_FULL)
@@ -81,6 +93,7 @@ namespace resedit::ui
 								->set_size_y(MODUI_SIZE_HEIGHT_WRAP)
 								->set_spacing(DP(10))
 								->set_id("rp_holder_ll")
+								
 						)
 				)
 		);

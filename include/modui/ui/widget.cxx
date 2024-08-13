@@ -4,6 +4,8 @@
 
 #include <cstdarg>
 
+#include <stdio.h>
+
 namespace modui::ui
 {
 	Widget::Widget() :
@@ -21,7 +23,13 @@ namespace modui::ui
 			this->_calculated_size = _size;
 		};
 
-	Widget::~Widget() {};
+	Widget::~Widget()
+	{
+		for (auto child : this->_children)
+		{
+			delete child;
+		}
+	};
 
 	Widget* Widget::init() { return new Widget(); }
 
@@ -48,7 +56,6 @@ namespace modui::ui
 			if (*i == widget)
 			{
 				this->_children.erase(i);
-				delete widget;
 				break;
 			}
 		}
@@ -165,14 +172,14 @@ namespace modui::ui
 	void Widget::render()
 	{
 		_MODUI_SHOW_BB(this);
-		ImGui::SetCursorPos(this->_pos);
+		ImGui::SetCursorScreenPos(this->_pos);
 		ImGui::Dummy(this->_calculated_size);
 	}
 
 #ifdef MODUI_SHOW_BOUNDING_BOXES
 	void Widget::render_bounding_box()
 	{
-		ImGui::GetWindowDrawList()->AddRect(this->_bounding_box_pos, this->_bounding_box_pos + this->_bounding_box_size, this->get_theme().inverse_surface);
+		ImGui::GetWindowDrawList()->AddRect(this->_pos, this->_pos + this->_calculated_size, this->get_theme()().inverse_surface);
 	}
 #endif
 

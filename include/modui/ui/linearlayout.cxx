@@ -34,22 +34,18 @@ namespace modui::ui
 	{
 		if (this->_children.empty()) return;
 
+		// ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		// draw_list->AddRect(this->_bounding_box_pos, this->_bounding_box_pos + this->_bounding_box_size, 0xff7f7f7f, 0, 0, 2.0);
+
 		for (auto& child : this->_children)
 		{
 			child->render();
 		}
 
-		// if (this->_orientation == Orientation::VERTICAL)
-		// {
-		// 	this->_render_vertical();
-		// }
-		// else
-		// {
-		// 	this->_render_horizontal();
-		// }
-
 		ImGui::SetCursorScreenPos(this->_pos);
 		ImGui::Dummy(this->_calculated_size);
+
+		_MODUI_SHOW_BB(this);
 	}
 
 	void LinearLayout::_render_vertical()
@@ -122,7 +118,7 @@ namespace modui::ui
 
 		if (this->_orientation == Orientation::HORIZONTAL)
 		{
-			int widget_count = this->_children.size();
+			unsigned widget_count = this->_children.size();
 			unsigned widget_full_width_count = 0;
 			float inner_width_widgets = 0.0f;
 			float widget_full_width = 0.0f;
@@ -233,7 +229,7 @@ namespace modui::ui
 
 		if (this->_orientation == Orientation::VERTICAL)
 		{
-			int widget_count = this->_children.size();
+			unsigned widget_count = this->_children.size();
 			unsigned widget_full_height_count = 0;
 			float inner_height_widgets = 0.0f;
 			float widget_full_height = 0.0f;

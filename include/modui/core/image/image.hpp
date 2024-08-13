@@ -18,6 +18,8 @@ namespace modui::image
 	class Image
 	{
 	public:
+		virtual ~Image() = default;
+
 		static ImageID load(const std::string& file_path, ImageType image_type = ImageType::RASTER_IMAGE);
 		static ImageID load_from_memory(void* buffer, unsigned buffer_size = -1, ImageType image_type = ImageType::RASTER_IMAGE);
 

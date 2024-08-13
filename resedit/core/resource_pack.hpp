@@ -37,17 +37,41 @@ namespace resedit::core
 		//     (const std::string&) The author of the resource pack
 		const std::string& get_author() const { return _author; }
 
-		// Gets the edits count of the resource pack
+		// Gets the description of the resource pack
 		//
 		// Returns:
-		//     (size_t) The edits count of the resource pack
-		size_t get_edits_count() const { return _edits.size(); }
+		//     (const std::string&) The description of the resource pack
+		const std::string& get_description() const { return _description; }
+
+		// Gets the version of the resource pack
+		//
+		// Returns:
+		//     (const std::string&) The version of the resource pack
+		const std::string& get_version() const { return _version; }
 
 		// Gets the Sky version that the resource pack supports
 		//
 		// Returns:
 		//     (unsigned) The Sky version that the resource pack supports
 		unsigned get_sky_version() const { return _sky_version; }
+
+		// Gets the edits count of the resource pack
+		//
+		// Returns:
+		//     (size_t) The edits count of the resource pack
+		size_t get_edits_count() const { return _edits.size(); }
+
+		// Gets the enabled state of the resource pack
+		//
+		// Returns:
+		//     (bool) The enabled state of the resource pack
+		bool is_enabled() const { return _enabled; }
+
+		// Sets the enabled state of the resource pack
+		//
+		// Args:
+		//     enabled: (bool) The enabled state to set
+		void set_enabled(bool enabled);
 
 		// Handles asset data for the resource pack
 		//
@@ -71,7 +95,12 @@ namespace resedit::core
 		std::filesystem::path _path; // Path to the resource pack
 		std::string _name; // Name of the resource pack
 		std::string _author; // Author of the resource pack
+		std::string _description; // Description of the resource pack
+		std::string _version;
 		unsigned _sky_version; // Supported Sky version
+
+		bool _enabled;
+
 		std::vector<std::unique_ptr<Edit>> _edits; // Vector of edits for the resource pack
 	};
 }

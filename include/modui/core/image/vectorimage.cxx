@@ -22,6 +22,17 @@ namespace modui::image
 		this->_image_type = ImageType::VECTOR_IMAGE;
 	}
 
+	VectorImage::~VectorImage()
+	{
+		if (this->_texture != 0)
+		{
+			glDeleteTextures(1, (const GLuint*)&this->_texture);
+			this->_texture = 0;
+		}
+
+		nsvgDelete(this->_image);
+	}
+
 	void VectorImage::draw(Vec2 pos, Vec2 size, Col32 color)
 	{
 		if (this->_image == nullptr) return;

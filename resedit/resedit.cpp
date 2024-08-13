@@ -35,10 +35,11 @@ namespace resedit
 	{
 		_vfs_readfile_future.wait();
 
+		std::string asset_name = std::string(*(const char**)this_);
 		uint64_t written_len = _vfs_readfile_orig(this_, buffer, max_len);
 
 		AssetData asset_data{
-			std::string(*(const char**)this_),
+			asset_name,
 			buffer,
 			max_len,
 			&written_len
@@ -68,7 +69,12 @@ namespace resedit
 		{
 			std::string pack_id = _config.get_resource_pack_id(idx);
 			fs::path resource_pack_path = io::get_resource_pack_path(pack_id);
-			_resource_pack_manager.create(resource_pack_path);
+			auto resource_pack = _resource_pack_manager.create(resource_pack_path);
+
+			if (auto pack = resource_pack.lock())
+			{
+				pack->set_enabled(_config.is_resource_pack_enabled(idx));
+			}
 		}
 	}
 
@@ -146,7 +152,7 @@ namespace resedit
 
 			utils::extract_zip(temp_file_path, resource_pack_path);
 
-			_config.add_resource_pack_id(pack_id);
+			_config.add_resource_pack(pack_id, true);
 			_config.save();
 			resource_pack = _resource_pack_manager.create(resource_pack_path);
 
@@ -189,7 +195,7 @@ namespace resedit
 
 		size_t idx = _resource_pack_manager.get_index(resource_pack);
 		_resource_pack_manager.remove(resource_pack);
-		_config.remove_resource_pack_id(idx);
+		_config.remove_resource_pack(idx);
 		_config.save();
 
 		if (fs::exists(resource_pack_path / RESEDIT_RESOURCE_PACK_METADATA_FILENAME))
@@ -205,11 +211,23 @@ namespace resedit
 
 		if (pack_moved)
 		{
-			_config.move_resource_pack_id(idx, new_idx);
+			_config.move_resource_pack(idx, new_idx);
 			_config.save();
 		}
 
 		return pack_moved;
+	}
+
+	void set_resource_pack_enabled(std::weak_ptr<core::ResourcePack> resource_pack, bool enabled)
+	{
+		size_t idx = _resource_pack_manager.get_index(resource_pack);
+
+		if (auto pack = resource_pack.lock())
+		{
+			pack->set_enabled(enabled);
+			_config.set_resource_pack_enabled(idx, enabled);
+			_config.save();
+		}
 	}
 
 	size_t get_resource_pack_count()

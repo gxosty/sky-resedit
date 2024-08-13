@@ -17,7 +17,7 @@ namespace resedit
 		if (!fs::exists(_config_path))
 		{
 			_config = {
-				{"pack_ids", std::vector<std::string>{}},
+				{"packs", nlohmann::json::array()},
 				{"version", RESEDIT_CONFIG_VERSION}
 			};
 
@@ -46,30 +46,43 @@ namespace resedit
 
 	size_t Config::get_resource_pack_count()
 	{
-		return _config["pack_ids"].size();
+		return _config["packs"].size();
 	}
 
 	std::string Config::get_resource_pack_id(size_t idx)
 	{
-		return _config["pack_ids"][idx].get<std::string>();
+		return _config["packs"][idx]["id"].get<std::string>();
 	}
 
-	void Config::add_resource_pack_id(const std::string& pack_id)
+	bool Config::is_resource_pack_enabled(size_t idx)
 	{
-		_config["pack_ids"].push_back(pack_id);
+		return _config["packs"][idx]["enabled"].get<bool>();
 	}
 
-	void Config::move_resource_pack_id(size_t idx, size_t new_idx)
+	void Config::set_resource_pack_enabled(size_t idx, bool enabled)
+	{
+		_config["packs"][idx]["enabled"] = enabled;
+	}
+
+	void Config::add_resource_pack(const std::string& pack_id, bool enabled)
+	{
+		_config["packs"].push_back({
+			{"id", pack_id},
+			{"enabled", enabled}
+		});
+	}
+
+	void Config::move_resource_pack(size_t idx, size_t new_idx)
 	{
 		// I know there is more simpler way but meh
 
-		std::string pack_id = _config["pack_ids"][idx].get<std::string>();
-		_config["pack_ids"].erase(_config["pack_ids"].begin() + idx);
-		_config["pack_ids"].insert(_config["pack_ids"].begin() + new_idx, pack_id);
+		auto pack = _config["packs"][idx];
+		_config["packs"].erase(_config["packs"].begin() + idx);
+		_config["packs"].insert(_config["packs"].begin() + new_idx, pack);
 	}
 
-	void Config::remove_resource_pack_id(size_t idx)
+	void Config::remove_resource_pack(size_t idx)
 	{
-		_config["pack_ids"].erase(_config["pack_ids"].begin() + idx);
+		_config["packs"].erase(_config["packs"].begin() + idx);
 	}
 }

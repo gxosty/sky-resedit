@@ -10,6 +10,7 @@ namespace modui::image
 	{
 	public:
 		VectorImage(NSVGimage* image);
+		~VectorImage() override;
 
 		void draw(Vec2 pos, Vec2 size, Col32 color) override;
 

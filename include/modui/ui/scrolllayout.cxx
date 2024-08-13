@@ -27,7 +27,6 @@ namespace modui::ui
 			Theme& theme = this->get_theme();
 
 			ImGui::PushID(this->_id);
-			ImGui::SetCursorScreenPos(this->_pos);
 			ImGui::SetNextWindowPos(this->_pos);
 
 			ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, utils::dp(3));
@@ -53,6 +52,7 @@ namespace modui::ui
 			ImGui::PopStyleColor(5);
 			ImGui::PopStyleVar(2);
 			ImGui::PopID();
+			// _MODUI_SHOW_BB(this);
 		}
 	}
 

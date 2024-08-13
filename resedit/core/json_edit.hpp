@@ -13,6 +13,7 @@ namespace resedit::core
 		JsonReplaceByKeyEdit(
 			const std::string& asset_path,
 			const std::filesystem::path& file_path,
+			int repeat,
 			const std::string& compare_key,
 			const std::string& path_to_object_in_asset,
 			const std::string& path_to_object_in_file

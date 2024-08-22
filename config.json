@@ -1,11 +1,11 @@
 {
   "name": "libresedit.so",
   "author": "gxost",
-  "displayName": "ResEdit",
+  "displayName": "ResEdit (test build)",
   "description": "Resource editor for Sky:CoTL",
   "majorVersion": 1,
   "minorVersion": 0,
-  "patchVersion": 0,
+  "patchVersion": 1,
   "displaysUI": true,
   "selfManagedUI": true,
   "githubReleasesUrl": "",

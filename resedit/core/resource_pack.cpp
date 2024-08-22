@@ -52,7 +52,7 @@ namespace resedit::core
 				std::string asset = edit_info["asset"].get<std::string>();
 				std::string file = edit_info["file"].get<std::string>();
 				int repeat = edit_info.value("repeat", 1);
-				std::string edit_type_str = edit_info["edit_type"];
+				std::string edit_type_str = edit_info["edit_type"].get<std::string>();
 
 				fs::path file_path = resource_pack_path / file;
 
@@ -63,9 +63,10 @@ namespace resedit::core
 				}
 				else if (edit_type_str == "json_replace_by_key")
 				{
-					std::string compare_key = edit_info["compare_key"].get<std::string>();
-					std::string path_to_object_in_asset = edit_info["path_to_object_in_asset"].get<std::string>();
-					std::string path_to_object_in_file = edit_info["path_to_object_in_file"].get<std::string>();
+					nlohmann::json& params = edit_info["params"];
+					std::string compare_key = params["compare_key"].get<std::string>();
+					std::string path_to_object_in_asset = params["path_to_object_in_asset"].get<std::string>();
+					std::string path_to_object_in_file = params["path_to_object_in_file"].get<std::string>();
 
 					std::unique_ptr<Edit> edit =
 						std::make_unique<JsonReplaceByKeyEdit>(asset, file_path, repeat, compare_key, path_to_object_in_asset, path_to_object_in_file);

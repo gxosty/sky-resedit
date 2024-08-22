@@ -36,7 +36,16 @@ namespace resedit
 		_vfs_readfile_future.wait();
 
 		std::string asset_name = std::string(*(const char**)this_);
-		uint64_t written_len = _vfs_readfile_orig(this_, buffer, max_len);
+		uint64_t written_len = 0;
+
+		if (!asset_name.starts_with("RE_"))
+		{
+			written_len = _vfs_readfile_orig(this_, buffer, max_len);
+		}
+		else
+		{
+			LOGI("Found injected asset: %s", asset_name.c_str());
+		}
 
 		AssetData asset_data{
 			asset_name,

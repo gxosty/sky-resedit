@@ -1,6 +1,8 @@
 {
 	"name" : "Furry Classics",
 	"author" : "gxost",
+	"description" : "Your favourite classic capes, but furry!",
+	"version" : "v1.1",
 	"sky_version" : "any",
 	"edits" : [
 		{

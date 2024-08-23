@@ -89,7 +89,7 @@ namespace resedit
 
 	void initialize()
 	{
-		uintptr_t vfs_readfile_addr = CipherUtils::CipherScanPattern("FD 7B BE A9 FC 4F 01 A9 FD 03 00 91 FF 03 08 D1 03 14 40 F9 F3 03 00 AA 7F 00 02 EB 28 02 00 54", Flags::ReadAndExecute);
+		uintptr_t vfs_readfile_addr = CipherUtils::CipherScanPattern("FD 7B BD A9 FC 0B 00 F9 F4 4F 02 A9 FD 03 00 91 FF 03 08 D1 03 14 40 F9 F4 03 02 AA F3 03 00 AA", Flags::ReadAndExecute);
 
 		if (vfs_readfile_addr)
 		{

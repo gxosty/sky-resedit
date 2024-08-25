@@ -39,3 +39,7 @@ We welcome contributions from the community! If you're interested in contributin
 * **Create a Branch:** Create a new branch for your feature or bug fix.
 * **Make Changes:** Implement your changes and write clear commit messages.
 * **Submit a Pull Request:** Submit a pull request to the main repository, detailing your changes and addressing any feedback.
+
+**License**
+
+[sky-resedit](/) is licensed under [GNU General Public License v3.0](LICENSE)

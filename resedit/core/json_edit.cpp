@@ -182,7 +182,6 @@ namespace resedit::core
 				nlohmann::json to_object_json(to_object);
 				from_object_json.merge_patch(to_object_json);
 				from_object = *from_object_json.get_ptr<nlohmann::json::object_t*>();
-				LOGI("Done");
 			}
 		}
 

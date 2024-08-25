@@ -9,7 +9,8 @@
 #include <misc/Logger.h>
 #include <fileselector/fileselector.h>
 
-#include <future>
+#include <thread>
+#include <chrono>
 #include <filesystem>
 #include <unistd.h>
 
@@ -21,19 +22,26 @@ namespace resedit
 	ImportResult _last_import_result = ImportResult::None;
 	std::string _last_error_message{""};
 
-	std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> _imported_callback = [](std::weak_ptr<core::ResourcePack>, ImportResult){};
+	std::function<void(std::weak_ptr<core::ResourcePack>, ImportResult)> _imported_callback;
 
 	Config _config(io::get_config_path());
 	core::ResourcePackManager _resource_pack_manager;
 	
 	CipherBase* _vfs_readfile_cipher_hook = nullptr;
-	std::promise<void> _vfs_readfile_promise;
-	std::future<void> _vfs_readfile_future = _vfs_readfile_promise.get_future();
 
 	uint64_t (*_vfs_readfile_orig)(void* this_, char* buffer, uint64_t max_len);
 	uint64_t _vfs_readfile_hook(void* this_, char* buffer, uint64_t max_len)
 	{
-		_vfs_readfile_future.wait();
+		if (_state == State::NotInitialized)
+		{
+			LOGI("`Vfs::ReadFile` called, but resedit not initialized, waiting...");
+
+			while (_state == State::NotInitialized)
+			{
+				// simple ways are always the best
+				std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			}
+		}
 
 		std::string asset_name = std::string(*(const char**)this_);
 		uint64_t written_len = 0;
@@ -98,6 +106,10 @@ namespace resedit
 				->set_Callback((uintptr_t)&_vfs_readfile_orig)
 				->set_Address(vfs_readfile_addr, false)
 				->Fire();
+
+			LOGI("Hooked `Vfs::ReadFile`");
+		} else {
+			LOGW("Failed to hook `Vfs::ReadFile`");
 		}
 
 		fs::path base_path = io::get_base_path();
@@ -114,7 +126,6 @@ namespace resedit
 		}
 
 		_set_state(State::Initialized);
-		_vfs_readfile_promise.set_value();
 	}
 
 	void _clear_temp_dir()
@@ -124,43 +135,63 @@ namespace resedit
 
 	void _import_resource_pack(int fd)
 	{
+		LOGI("Importing resource pack");
 		_last_import_result = ImportResult::None;
 		std::weak_ptr<core::ResourcePack> resource_pack;
 
 		size_t file_size = lseek(fd, 0, SEEK_END);
+		LOGI("File size: %lu", file_size);
 		lseek(fd, 0, SEEK_SET);
-		char buffer[file_size + 1];
+		LOGI("Allocating heap for file");
+		// do NOT do stack allocation
+		char* buffer = (char*)malloc(file_size);
+		LOGI("Reading file");
 		read(fd, buffer, file_size);
+		LOGI("Closing file handler");
 		close(fd);
 
 		fs::path temp_dir = io::get_temp_directory_path();
 		fs::path temp_file_path = temp_dir / "temp.zip";
 
+		LOGI("Temp file path: %s", temp_file_path.string().c_str());
+
 		if (!fs::is_directory(temp_dir))
 			fs::create_directory(temp_dir);
 
+		LOGI("Copying resource pack to temporary path");
 		FILE* temp_file = fopen(temp_file_path.string().c_str(), "w");
 		fwrite(buffer, 1, file_size, temp_file);
 		fclose(temp_file);
+		free(buffer);
+		LOGI("Copying completed");
 
 		try
 		{
+			LOGI("Extracting resource pack metadata");
 			// Extract metadata to temporary directory
 			utils::extract_file_from_zip(temp_file_path, RESEDIT_RESOURCE_PACK_METADATA_FILENAME, temp_dir);
 			fs::path metadata_path = temp_dir / RESEDIT_RESOURCE_PACK_METADATA_FILENAME;
 
+			LOGI("Checking resource pack for validity");
+
 			// Try creating temporary resource pack to see if metadata is correct
 			core::ResourcePack temp_resource_pack(temp_dir);
 
+			LOGI("Resource pack valid");
+
 			// Create new ID for resource pack
 			std::string pack_id = utils::get_time_in_seconds_as_string();
+
+			LOGI("Assigned ID: %s", pack_id.c_str());
 
 			// Get resource pack's path
 			fs::path resource_pack_path = io::get_resource_pack_path(pack_id);
 			fs::create_directories(resource_pack_path);
 
+			LOGI("Extracting resource pack");
 			utils::extract_zip(temp_file_path, resource_pack_path);
 
+			LOGI("Saving resource pack to config");
 			_config.add_resource_pack(pack_id, true);
 			_config.save();
 			resource_pack = _resource_pack_manager.create(resource_pack_path);
@@ -169,13 +200,18 @@ namespace resedit
 		}
 		catch (const std::runtime_error& error)
 		{
+			LOGE("Error: %s", error.what());
 			_last_import_result = ImportResult::NotImported;
 			_last_error_message = std::string(error.what());
 		}
 
+		LOGI("Clearing temp dir");
 		_clear_temp_dir();
 
-		_imported_callback(resource_pack, _last_import_result);
+		LOGI("Calling `_imported_callback`");
+
+		if (_imported_callback)
+			_imported_callback(resource_pack, _last_import_result);
 	}
 
 	void import_resource_pack()

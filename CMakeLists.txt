@@ -24,8 +24,8 @@ endif (WIN32)
 set(CMAKE_SYSTEM_NAME Android)
 
 # USER CONFIGURATION
-set(HOST_TAG ${_HOST_TAG})													# The Host where we compile the lib
-set(ANDROID_NDK_VERSION "26.3.11579264")											# Only needed if you are not using standalone NDK, otherwise you can put this empty
+set(HOST_TAG ${_HOST_TAG})													# The Host where we compile the lib										
+# set(ANDROID_NDK_VERSION "26.3.11579264")											# Only needed if you are not using standalone NDK, otherwise you can put this empty
 set(ANDROID_ARCH "aarch64")													# Android architecture
 set(CMAKE_ANDROID_ARCH_ABI "arm64-v8a")												# Android ABI
 set(CMAKE_ANDROID_API 34)													# Android API version

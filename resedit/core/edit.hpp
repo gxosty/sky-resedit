@@ -19,6 +19,7 @@ namespace resedit::core
 		bool is_applied() const { return _is_applied; }
 
 		virtual void apply(const AssetData& asset_data) = 0;
+		virtual uint64_t get_modified_size(const AssetData& asset_data) = 0;
 
 	protected:
 		std::string _asset_path;

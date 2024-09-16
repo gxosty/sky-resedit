@@ -73,6 +73,15 @@ namespace resedit::core
 		//     enabled: (bool) The enabled state to set
 		void set_enabled(bool enabled);
 
+		// Checks if the resource pack can edit the asset
+		//
+		// Args
+		//     asset_path: (const std::string&) The asset path
+		//
+		// Returns
+		//     (bool) `true` if the resource pack can edit the asset, otherwise `false` 
+		bool any_edit_for_asset(const std::string& asset_path);
+
 		// Handles asset data for the resource pack
 		//
 		//! It can make changes to the asset buffer if valid edit object was found
@@ -83,6 +92,8 @@ namespace resedit::core
 		// Returns:
 		//     (bool) `true` if asset was edited/modified, `false` otherwise
 		bool handle(const AssetData& asset_data);
+
+		uint64_t get_asset_size(const AssetData& asset_data);
 
 	private:
 		// Adds an edit to the resource pack

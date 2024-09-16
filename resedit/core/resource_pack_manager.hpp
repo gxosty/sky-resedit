@@ -3,7 +3,9 @@
 #include "common.hpp"
 #include "resource_pack.hpp"
 
+#include <cstdint>
 #include <vector>
+#include <string>
 #include <memory>
 #include <filesystem>
 
@@ -83,6 +85,15 @@ namespace resedit::core
 		//     (size_t) The new index of the moved resource pack
 		size_t move(std::weak_ptr<ResourcePack> resource_pack, MoveDirection direction);
 
+		// Checks if any resource pack can edit the asset
+		//
+		// Args
+		//     asset_path: (const std::string&) The asset path
+		//
+		// Returns
+		//     (bool) `true` if any resource pack can edit the asset, otherwise `false` 
+		bool any_edit_for_asset(const std::string& asset_path);
+
 		// Passes asset data to resource packs for editing
 		//
 		// Args:
@@ -90,7 +101,16 @@ namespace resedit::core
 		//
 		// Returns:
 		//     (bool) `true` if asset was edited/modified, `false` otherwise
-		bool handle_asset(const AssetData& asset_data);
+		bool edit_asset(const AssetData& asset_data);
+
+		// Gets size of the asset if any resource pack modifies it
+		//
+		// Args:
+		//     asset_data: (const AssetData&) The asset data to get size of
+		//
+		// Returns:
+		//     (uint64_t) The size of the asset if any resource pack modifies it, otherwise `asset_data.written_len`
+		uint64_t get_asset_size(const AssetData& asset_data);
 
 	private:
 		std::vector<std::shared_ptr<ResourcePack>> _packs; // Vector of resource packs

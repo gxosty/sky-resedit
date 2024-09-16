@@ -25,6 +25,9 @@ namespace resedit
 	// Initializes ResEdit.
 	void initialize();
 
+	// Late initialize ResEdit
+	void initialize_late();
+
 	// Imports a new resource pack from storage.
 	void import_resource_pack();
 

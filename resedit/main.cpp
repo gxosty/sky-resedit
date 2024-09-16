@@ -39,6 +39,7 @@ void InitLate() {
     modui::set_screen_density(CipherUtils::get_DeviceInfo().density);
     modui::set_ui_scale(0.8f);
     resedit::ResEditApp::initialize();
+    resedit::initialize_late();
 }
 
 // Called at the start of the game

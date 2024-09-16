@@ -90,6 +90,7 @@ add_library( # Sets the name of the library.
 	${CUR_NAME}
 	SHARED
 	
+	resedit/asset_manager_hook.cpp
 	resedit/main.cpp
 	resedit/config.cpp
 	resedit/resedit.cpp
@@ -151,10 +152,12 @@ target_link_libraries(
 	${CUR_NAME}
 	ciphered
 	log
+	android
 
 	EGL
 	GLESv3
 
+	dobby
 	minizip
 )
 

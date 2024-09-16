@@ -2,6 +2,7 @@
 #include "resedit.hpp"
 #include "config.hpp"
 #include "resedit_io.hpp"
+#include "asset_manager_hook.hpp"
 #include "utils.hpp"
 
 #include <Cipher/Cipher.h>
@@ -12,6 +13,7 @@
 #include <thread>
 #include <chrono>
 #include <filesystem>
+#include <cmath>
 #include <unistd.h>
 
 namespace resedit
@@ -29,12 +31,11 @@ namespace resedit
 	
 	CipherBase* _vfs_readfile_cipher_hook = nullptr;
 
-	uint64_t (*_vfs_readfile_orig)(void* this_, char* buffer, uint64_t max_len);
-	uint64_t _vfs_readfile_hook(void* this_, char* buffer, uint64_t max_len)
+	uint64_t asset_read(AAsset* asset, const std::string& asset_path, char* buffer, uint64_t max_len)
 	{
 		if (_state == State::NotInitialized)
 		{
-			LOGI("`Vfs::ReadFile` called, but resedit not initialized, waiting...");
+			LOGI("`AAsset_read` called, but resedit hasn't been initialized yet, waiting...");
 
 			while (_state == State::NotInitialized)
 			{
@@ -43,31 +44,70 @@ namespace resedit
 			}
 		}
 
-		std::string asset_name = std::string(*(const char**)this_);
-		uint64_t written_len = 0;
-
-		if (!asset_name.starts_with("RE_"))
+		if (_resource_pack_manager.any_edit_for_asset(asset_path))
 		{
-			written_len = _vfs_readfile_orig(this_, buffer, max_len);
+			auto asset_size = asset_manager_hook::aasset_get_length_orig(asset);
+			uint64_t written_len = 0;
+			uint64_t inner_buffer_size = fmax(asset_size, max_len);
+			char* inner_buffer = new char[inner_buffer_size];
+			inner_buffer[asset_size-1] = 0;
+
+			if (!asset_path.starts_with("RE_"))
+			{
+				written_len = asset_manager_hook::aasset_read_orig(asset, (void*)inner_buffer, inner_buffer_size);
+			}
+			else
+			{
+				LOGI("Found injected asset: %s", asset_path.c_str());
+			}
+
+			AssetData asset_data{
+				asset_path,
+				inner_buffer,
+				inner_buffer_size,
+				&written_len
+			};
+
+			if (_resource_pack_manager.edit_asset(asset_data))
+			{
+				LOGI("Modified: %s", asset_path.c_str());
+				memcpy(buffer, (void*)inner_buffer, written_len);
+			}
+
+			delete[] inner_buffer;
+
+			return written_len;
 		}
-		else
+
+		return asset_manager_hook::aasset_read_orig(asset, buffer, max_len);
+	}
+
+	off_t asset_get_length(AAsset* asset, const std::string& asset_path)
+	{
+		auto asset_size = asset_manager_hook::aasset_get_length_orig(asset);
+
+		if (_resource_pack_manager.any_edit_for_asset(asset_path))
 		{
-			LOGI("Found injected asset: %s", asset_name.c_str());
+			uint64_t max_len = pow(2, (ceil(log2(asset_size))));
+			char* buffer = new char[max_len];
+			buffer[max_len-1] = 0;
+			AAsset_seek(asset, 0, SEEK_SET);
+			uint64_t written_len = asset_manager_hook::aasset_read_orig(asset, (void*)buffer, max_len);
+			AAsset_seek(asset, 0, SEEK_SET);
+
+			AssetData asset_data{
+				asset_path,
+				buffer,
+				max_len,
+				&written_len
+			};
+
+			asset_size = _resource_pack_manager.get_asset_size(asset_data);
+
+			delete[] buffer;
 		}
 
-		AssetData asset_data{
-			asset_name,
-			buffer,
-			max_len,
-			&written_len
-		};
-
-		if (_resource_pack_manager.handle_asset(asset_data))
-		{
-			LOGI("Modified: %s", *(const char**)this_);
-		}
-
-		return written_len;
+		return asset_size;
 	}
 
 	void _set_state(State state)
@@ -97,20 +137,9 @@ namespace resedit
 
 	void initialize()
 	{
-		uintptr_t vfs_readfile_addr = CipherUtils::CipherScanPattern("FD 7B BD A9 FC 0B 00 F9 F4 4F 02 A9 FD 03 00 91 FF 03 08 D1 03 14 40 F9 F4 03 02 AA F3 03 00 AA", Flags::ReadAndExecute);
-
-		if (vfs_readfile_addr)
-		{
-			_vfs_readfile_cipher_hook = (new CipherHook())
-				->set_Hook((uintptr_t)_vfs_readfile_hook)
-				->set_Callback((uintptr_t)&_vfs_readfile_orig)
-				->set_Address(vfs_readfile_addr, false)
-				->Fire();
-
-			LOGI("Hooked `Vfs::ReadFile`");
-		} else {
-			LOGW("Failed to hook `Vfs::ReadFile`");
-		}
+		asset_manager_hook::set_asset_read_callback(asset_read);
+		asset_manager_hook::set_asset_get_length_callback(asset_get_length);
+		asset_manager_hook::apply_hooks();
 
 		fs::path base_path = io::get_base_path();
 
@@ -119,13 +148,12 @@ namespace resedit
 
 		_initialize_resource_packs();
 
-		if (!vfs_readfile_addr)
-		{
-			_set_state(State::HookError);
-			return;
-		}
-
 		_set_state(State::Initialized);
+	}
+
+	void initialize_late()
+	{
+		asset_manager_hook::restore_hooks();
 	}
 
 	void _clear_temp_dir()

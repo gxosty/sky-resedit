@@ -14,6 +14,21 @@ namespace resedit::core
 
 	void ReplaceEdit::apply(const AssetData& asset_data)
 	{
+		_apply(asset_data);
+
+		if (!--_repeat)
+			_is_applied = true;
+	}
+
+	uint64_t ReplaceEdit::get_modified_size(const AssetData& asset_data)
+	{
+		_apply(asset_data);
+
+		return *asset_data.written_len;
+	}
+
+	void ReplaceEdit::_apply(const AssetData& asset_data)
+	{
 		std::ifstream file(_file_path);
 
 		if (!file.is_open())
@@ -24,8 +39,5 @@ namespace resedit::core
 		asset_data.written_len[0] = file.gcount();
 
 		file.close();
-
-		if (!--_repeat)
-			_is_applied = true;
 	}
 }

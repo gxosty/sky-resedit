@@ -22,6 +22,10 @@ namespace resedit::core
 		~JsonReplaceByKeyEdit() override = default;
 
 		void apply(const AssetData& asset_data) override;
+		uint64_t get_modified_size(const AssetData& asset_data) override;
+
+	private:
+		void _apply(const AssetData& asset_data);
 
 	private:
 		std::string _compare_key;

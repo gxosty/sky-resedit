@@ -69,7 +69,20 @@ namespace resedit::core
 		return idx;
 	}
 
-	bool ResourcePackManager::handle_asset(const AssetData& asset_data)
+	bool ResourcePackManager::any_edit_for_asset(const std::string& asset_path)
+	{
+		for (auto& pack : _packs)
+		{
+			if (pack->any_edit_for_asset(asset_path))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool ResourcePackManager::edit_asset(const AssetData& asset_data)
 	{
 		if (_packs.empty()) return false;
 
@@ -78,9 +91,22 @@ namespace resedit::core
 		for (auto pack_it = _packs.end() - 1; pack_it >= _packs.begin(); pack_it--)
 		{
 			if ((*pack_it)->is_enabled())
-				is_modified = (*pack_it)->handle(asset_data);
+				is_modified = (*pack_it)->handle(asset_data) || is_modified;
 		}
 
 		return is_modified;
+	}
+
+	uint64_t ResourcePackManager::get_asset_size(const AssetData& asset_data)
+	{
+		for (auto& pack : _packs)
+		{
+			if (pack->any_edit_for_asset(asset_data.path))
+			{
+				return pack->get_asset_size(asset_data);
+			}
+		}
+
+		return *asset_data.written_len;
 	}
 }

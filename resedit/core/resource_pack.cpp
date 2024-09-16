@@ -7,6 +7,8 @@
 
 #include <fstream>
 
+#include <misc/Logger.h>
+
 namespace resedit::core
 {
 	namespace fs = std::filesystem;
@@ -85,6 +87,19 @@ namespace resedit::core
 		_enabled = enabled;
 	}
 
+	bool ResourcePack::any_edit_for_asset(const std::string& asset_path)
+	{
+		for (auto& edit : _edits)
+		{
+			if (edit->matches(asset_path))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	bool ResourcePack::handle(const AssetData& asset_data)
 	{
 		bool is_modified = false;
@@ -100,6 +115,20 @@ namespace resedit::core
 
 		return is_modified;
 	}
+
+	uint64_t ResourcePack::get_asset_size(const AssetData& asset_data)
+	{
+		for (auto& edit : _edits)
+		{
+			if (edit->matches(asset_data.path) && !edit->is_applied())
+			{
+				return edit->get_modified_size(asset_data);
+			}
+		}
+
+		return *asset_data.written_len;
+	}
+
 
 	void ResourcePack::add_edit(std::unique_ptr<Edit> edit)
 	{

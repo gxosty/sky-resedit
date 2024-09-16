@@ -129,6 +129,21 @@ namespace resedit::core
 
 	void JsonReplaceByKeyEdit::apply(const AssetData& asset_data)
 	{
+		_apply(asset_data);
+
+		if (!--_repeat)
+			_is_applied = true;
+	}
+
+	uint64_t JsonReplaceByKeyEdit::get_modified_size(const AssetData& asset_data)
+	{
+		_apply(asset_data);
+
+		return *asset_data.written_len;
+	}
+
+	void JsonReplaceByKeyEdit::_apply(const AssetData& asset_data)
+	{
 		std::ifstream file(_file_path);
 
 		if (!file.is_open())
@@ -137,22 +152,17 @@ namespace resedit::core
 		}
 
 		std::string asset_buffer(asset_data.buffer, asset_data.written_len[0]);
-		LOGI("Parsing `asset_buffer`");
 		nlohmann::json from_json = nlohmann::json::parse(asset_buffer);
-		LOGI("Parsing `file`");
 		nlohmann::json to_json;
 		file >> to_json;
-		LOGI("Done");
 
 		file.close();
 
 		std::vector<JsonPathElement> from_output;
 		std::vector<JsonPathElement> to_output;
 
-		LOGI("Parsing paths");
 		_parse_json_path(from_output, from_json, _path_to_object_in_asset);
 		_parse_json_path(to_output, to_json, _path_to_object_in_file);
-		LOGI("Done");
 
 		for (auto& from_object_data : from_output)
 		{
@@ -177,7 +187,6 @@ namespace resedit::core
 					continue;
 				}
 
-				LOGI("Patching");
 				nlohmann::json from_object_json(from_object);
 				nlohmann::json to_object_json(to_object);
 				from_object_json.merge_patch(to_object_json);
@@ -185,14 +194,9 @@ namespace resedit::core
 			}
 		}
 
-		LOGI("Dumping");
 		std::string buffer = from_json.dump();
 		memset(asset_data.buffer, 0, asset_data.max_len);
 		strcpy(asset_data.buffer, buffer.c_str());
 		asset_data.written_len[0] = buffer.size();
-		LOGI("Done");
-
-		if (!--_repeat)
-			_is_applied = true;
 	}
 }

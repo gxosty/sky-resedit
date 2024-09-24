@@ -58,7 +58,7 @@ namespace modui::ui
 		text_pos.x += this->_padding.w;
 		text_pos.y += this->_padding.x;
 
-		draw_list->AddText(ImGui::GetFont(), this->_font_size, text_pos, this->is_on_card() ? theme().on_surface_variant : theme().on_surface, this->_text.c_str(), nullptr, this->_calculated_size.x);
+		draw_list->AddText(ImGui::GetFont(), this->_font_size, text_pos, this->is_on_card() ? theme(ThemeColor::OnSurfaceVariant) : theme(ThemeColor::OnSurface), this->_text.c_str(), nullptr, this->_calculated_size.x);
 	}
 
 	void Text::_update_text_size(float available_width)

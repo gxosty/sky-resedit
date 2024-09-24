@@ -66,11 +66,11 @@ namespace modui::ui
 		Col32 ripple_color;
 		Col4 outline_color, handle_color;
 
-		ripple_color = (theme().primary & 0xFFFFFF) | (unsigned(0xFF * this->_press_factor * 0.1f) << 24);
+		ripple_color = theme[ThemeColor::Primary].get_alpha_applied(Theme::global_alpha * this->_press_factor * 0.1f);
 
 		Col4 fill_color = utils::mix(
-			utils::Col32to4(theme().surface_container_highest),
-			utils::Col32to4(theme().primary),
+			utils::Col32to4(theme(ThemeColor::SurfaceContainerHighest)),
+			utils::Col32to4(theme(ThemeColor::Primary)),
 			this->_state_factor
 		);
 
@@ -81,14 +81,14 @@ namespace modui::ui
 		);
 
 		outline_color = utils::mix(
-			utils::Col32to4(theme().outline),
+			utils::Col32to4(theme(ThemeColor::Outline)),
 			Col4(0, 0, 0, 0),
 			this->_state_factor
 		);
 
 		handle_color = utils::mix(
-			utils::Col32to4(theme().outline),
-			utils::Col32to4(theme().on_primary),
+			utils::Col32to4(theme(ThemeColor::Outline)),
+			utils::Col32to4(theme(ThemeColor::OnPrimary)),
 			this->_state_factor
 		);
 

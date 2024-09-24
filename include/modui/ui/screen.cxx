@@ -1,10 +1,12 @@
 #include <modui/ui/screen.hpp>
+#include <modui/core/style/theme.hpp>
 #include <modui/core/exceptions.hpp>
 
 namespace modui::ui
 {
 	Screen::Screen(const std::string& name) : Widget(),
-		_name{name} {}
+		_name{name},
+		alpha{1.0f} {}
 
 	Screen* Screen::init(const std::string& name) { return new Screen(name); }
 
@@ -31,7 +33,12 @@ namespace modui::ui
 	void Screen::render()
 	{
 		if (!this->_children.empty())
+		{
+			float bkp_theme_alpha = Theme::global_alpha;
+			Theme::global_alpha *= this->alpha;
 			this->_children[0]->render();
+			Theme::global_alpha = bkp_theme_alpha;
+		}
 	}
 
 	// float Screen::get_wrapped_size_x()

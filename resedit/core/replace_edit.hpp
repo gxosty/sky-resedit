@@ -10,7 +10,7 @@ namespace resedit::core
 	class ReplaceEdit : public Edit
 	{
 	public:
-		ReplaceEdit(const std::string& asset_path, const std::filesystem::path& file_path, int repeat);
+		ReplaceEdit(const std::string& asset_path, const std::filesystem::path& file_path, int repeat, bool is_injected);
 		~ReplaceEdit() override = default;
 
 		void apply(const AssetData& asset_data) override;

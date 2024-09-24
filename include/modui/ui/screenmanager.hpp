@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/common.hpp"
+#include "../animation/screen/screenanimation.hpp"
 #include "widget.hpp"
 #include "screen.hpp"
 
@@ -12,8 +13,8 @@ namespace modui::ui
 	class ScreenManager : public Widget
 	{
 	public:
-		ScreenManager();
-		static ScreenManager* init();
+		ScreenManager(animation::ScreenAnimation* animation);
+		static ScreenManager* init(animation::ScreenAnimation* animation = nullptr);
 
 		ScreenManager* set_screen(const std::string& screen_name) override;
 		Screen* get_screen(const std::string& screen_name);
@@ -31,5 +32,8 @@ namespace modui::ui
 
 	private:
 		Screen* _current_screen;
+		Screen* _next_screen;
+
+		animation::ScreenAnimation* _animation;
 	};
 }

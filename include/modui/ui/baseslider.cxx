@@ -26,7 +26,7 @@ namespace modui::ui
 
 	Widget* BaseSlider::on_slide(ButtonInputCallback callback)
 	{
-		this->_on_slide_callback = callback;
+		this->_on_slide_callback = std::move(callback);
 
 		return this;
 	}

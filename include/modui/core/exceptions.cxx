@@ -2,8 +2,11 @@
 
 namespace modui::exceptions
 {
-	ThemeNotFoundException::ThemeNotFoundException(const std::string& theme_name)
-		: std::runtime_error("Theme \"" + theme_name + "\" not found") {};
+	ThemeNotFoundException::ThemeNotFoundException(uint32_t id)
+		: std::runtime_error("Theme with id \"" + std::to_string(id) + "\" not found") {};
+
+	AddThemeException::AddThemeException(const std::string& reason)
+		: std::runtime_error(reason) {};
 
 	AddWidgetException::AddWidgetException(const std::string& reason)
 		: std::runtime_error(reason) {};

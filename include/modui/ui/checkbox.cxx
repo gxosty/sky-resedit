@@ -59,23 +59,23 @@ namespace modui::ui
 		Col4 outline_color, fill_color;
 		Col32 ripple_color;
 
-		ripple_color = (theme().primary & 0xFFFFFF) | (unsigned(0xFF * this->_press_factor * 0.1f) << 24);
+		ripple_color = theme[ThemeColor::Primary].get_alpha_applied(Theme::global_alpha * this->_press_factor * 0.1f);
 		outline_color = utils::Col32to4(ripple_color);
 
 		if (this->_state)
 		{
-			fill_color = utils::Col32to4(theme().primary);
-			outline_color = utils::Col32to4(theme().primary);
+			fill_color = utils::Col32to4(theme(ThemeColor::Primary));
+			outline_color = utils::Col32to4(theme(ThemeColor::Primary));
 		}
 		else
 		{
 			fill_color = Vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 			outline_color = utils::mix(
-				utils::Col32to4(theme().outline),
+				utils::Col32to4(theme(ThemeColor::Outline)),
 				utils::add_button_pressed_layer(
-					utils::Col32to4(theme().outline),
-					utils::Col32to4(theme().outline_variant)
+					utils::Col32to4(theme(ThemeColor::Outline)),
+					utils::Col32to4(theme(ThemeColor::OutlineVariant))
 				),
 				this->_press_factor
 			);
@@ -96,8 +96,8 @@ namespace modui::ui
 			Vec2 l2_p1 = l1_p2;
 			Vec2 l2_p2 = Vec2(box_pos.x + __box_size.x - utils::dp(4), box_pos.y + utils::dp(4));
 
-			draw_list->AddLine(l1_p1, l1_p2, theme().on_primary, __outline_width);
-			draw_list->AddLine(l2_p1, l2_p2, theme().on_primary, __outline_width);
+			draw_list->AddLine(l1_p1, l1_p2, theme(ThemeColor::OnPrimary), __outline_width);
+			draw_list->AddLine(l2_p1, l2_p2, theme(ThemeColor::OnPrimary), __outline_width);
 		}
 	}
 

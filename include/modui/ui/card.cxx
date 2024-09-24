@@ -25,7 +25,7 @@ namespace modui::ui
 		draw_list->AddRectFilled(
 			this->_pos,
 			this->_pos + this->_calculated_size,
-			theme().surface_container_highest,
+			theme(ThemeColor::SurfaceContainerHighest),
 			this->_rounding
 		);
 

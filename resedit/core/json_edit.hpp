@@ -14,6 +14,7 @@ namespace resedit::core
 			const std::string& asset_path,
 			const std::filesystem::path& file_path,
 			int repeat,
+			bool is_injected,
 			const std::string& compare_key,
 			const std::string& path_to_object_in_asset,
 			const std::string& path_to_object_in_file

@@ -10,8 +10,12 @@
 
 namespace resedit::core
 {
+	class ResourcePackManager;
+
 	class ResourcePack
 	{
+		friend class ResourcePackManager;
+
 	public:
 		// Constructs a new ResourcePack instance
 		//

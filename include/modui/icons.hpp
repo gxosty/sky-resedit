@@ -52,6 +52,7 @@ namespace modui::icons
 	extern ImageID ic_logout;
 	extern ImageID ic_menu;
 	extern ImageID ic_more_horiz;
+	extern ImageID ic_more_vert;
 	extern ImageID ic_open_in_view;
 	extern ImageID ic_person_outline;
 	extern ImageID ic_person;

@@ -4,9 +4,6 @@
 namespace modui::ui
 {
 	BaseButton::BaseButton() : Widget(),
-		_on_press_callback{MODUI_EMPTY_CALLBACK},
-		_on_hold_callback{MODUI_EMPTY_CALLBACK},
-		_on_release_callback{MODUI_EMPTY_CALLBACK},
 		_is_pressed{false},
 		_is_released{false}
 	{
@@ -15,38 +12,41 @@ namespace modui::ui
 
 	Widget* BaseButton::on_press(ButtonInputCallback callback)
 	{
-		this->_on_press_callback = callback;
+		this->_on_press_callback = std::move(callback);
 
 		return this;
 	}
 
 	Widget* BaseButton::on_hold(ButtonInputCallback callback)
 	{
-		this->_on_hold_callback = callback;
+		this->_on_hold_callback = std::move(callback);
 
 		return this;
 	}
 
 	Widget* BaseButton::on_release(ButtonInputCallback callback)
 	{
-		this->_on_release_callback = callback;
+		this->_on_release_callback = std::move(callback);
 
 		return this;
 	}
 
 	void BaseButton::on_press_call()
 	{
-		modui::get_current_app()->add_callback_to_queue(this, &this->_on_press_callback);
+		if (this->_on_press_callback)
+			modui::get_current_app()->add_callback_to_queue(this, &this->_on_press_callback);
 	}
 
 	void BaseButton::on_hold_call()
 	{
-		modui::get_current_app()->add_callback_to_queue(this, &this->_on_hold_callback);
+		if (this->_on_hold_callback)
+			modui::get_current_app()->add_callback_to_queue(this, &this->_on_hold_callback);
 	}
 
 	void BaseButton::on_release_call()
 	{
-		modui::get_current_app()->add_callback_to_queue(this, &this->_on_release_callback);
+		if (this->_on_release_callback)
+			modui::get_current_app()->add_callback_to_queue(this, &this->_on_release_callback);
 	}
 
 	void BaseButton::render()

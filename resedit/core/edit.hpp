@@ -10,8 +10,8 @@ namespace resedit::core
 	class Edit
 	{
 	public:
-		Edit(const std::string& asset_path, const std::filesystem::path& file_path, int repeat)
-			: _asset_path{asset_path}, _file_path{file_path}, _repeat{repeat}, _is_applied{false} {}
+		Edit(const std::string& asset_path, const std::filesystem::path& file_path, int repeat, bool is_injected)
+			: _asset_path{asset_path}, _file_path{file_path}, _repeat{repeat}, _is_injected{is_injected}, _is_applied{false} {}
 
 		virtual ~Edit() = default;
 
@@ -25,6 +25,7 @@ namespace resedit::core
 		std::string _asset_path;
 		std::filesystem::path _file_path;
 		int _repeat;
+		bool _is_injected;
 		bool _is_applied;
 	};
 }

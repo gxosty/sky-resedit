@@ -65,8 +65,8 @@ namespace modui::ui
 			1.0f
 		);
 
-		Col4 fill_color = utils::Col32to4(theme().primary);
-		Col32 ripple_color = (theme().on_primary & 0xFFFFFF) | (unsigned(0xFF * this->_press_factor * 0.1f) << 24);
+		Col4 fill_color = utils::Col32to4(theme(ThemeColor::Primary));
+		Col32 ripple_color = theme[ThemeColor::OnPrimary].get_alpha_applied(Theme::global_alpha * this->_press_factor * 0.1f);
 
 		draw_list->AddRectFilled(
 			pos,
@@ -84,7 +84,7 @@ namespace modui::ui
 
 		Vec2 text_pos = pos + (size - this->_text_size) / 2.0f;
 
-		draw_list->AddText(ImGui::GetFont(), this->_font_size, text_pos, theme().on_primary, this->_text.c_str());
+		draw_list->AddText(ImGui::GetFont(), this->_font_size, text_pos, theme(ThemeColor::OnPrimary), this->_text.c_str());
 	}
 
 	void Button::_update_text_size()

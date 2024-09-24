@@ -3,9 +3,12 @@
 
 namespace modui::ui
 {
-	ScreenManager::ScreenManager() : Widget() {}
+	ScreenManager::ScreenManager(animation::ScreenAnimation* animation) : Widget(),
+		_animation{animation},
+		_current_screen{nullptr},
+		_next_screen{nullptr} {}
 
-	ScreenManager* ScreenManager::init() { return new ScreenManager(); }
+	ScreenManager* ScreenManager::init(animation::ScreenAnimation* animation) { return new ScreenManager(animation); }
 
 	ScreenManager* ScreenManager::set_screen(const std::string& screen_name)
 	{
@@ -13,7 +16,29 @@ namespace modui::ui
 
 		if (screen == nullptr) throw exceptions::ScreenNotFoundException(screen_name);
 
-		this->_current_screen = screen;
+		if (this->_animation)
+		{
+			this->_next_screen = screen;
+
+			this->_animation
+				->from_screen(this->_current_screen)
+				->to_screen(this->_next_screen)
+				->set_duration(100)
+				->on_finish(MODUI_ANIMATION_FINISH_CALLBACK(this) {
+					if (this->_current_screen)
+						this->_current_screen->alpha = 1.0f;
+
+					if (this->_next_screen)
+						this->_next_screen->alpha = 1.0f;
+
+					this->_current_screen = this->_next_screen;
+					this->_next_screen = nullptr;
+				})->start();
+		}
+		else
+		{
+			this->_current_screen = screen;
+		}
 
 		return this;
 	}
@@ -43,19 +68,12 @@ namespace modui::ui
 
 	void ScreenManager::render()
 	{
-		if (!this->_children.empty())
+		if (this->_current_screen)
 			this->_current_screen->render();
+
+		if (this->_next_screen)
+			this->_next_screen->render();
 	}
-
-	// float ScreenManager::get_wrapped_size_x()
-	// {
-	// 	return MODUI_SIZE_WIDTH_FULL;
-	// }
-
-	// float ScreenManager::get_wrapped_size_y()
-	// {
-		// return MODUI_SIZE_HEIGHT_FULL;
-	// }
 
 	float ScreenManager::calculate_pos_x(float bounding_box_pos_x)
 	{
@@ -63,6 +81,9 @@ namespace modui::ui
 
 		if (this->_current_screen)
 			this->_current_screen->calculate_pos_x(ret);
+
+		if (this->_next_screen)
+			this->_next_screen->calculate_pos_x(ret);
 
 		return ret;
 	}
@@ -73,6 +94,9 @@ namespace modui::ui
 
 		if (this->_current_screen)
 			this->_current_screen->calculate_pos_y(ret);
+
+		if (this->_next_screen)
+			this->_next_screen->calculate_pos_y(ret);
 
 		return ret;
 	}
@@ -92,6 +116,7 @@ namespace modui::ui
 		}
 
 		if (this->_current_screen) this->_current_screen->calculate_size_x(x);
+		if (this->_next_screen) this->_next_screen->calculate_size_x(x);
 		this->_calculated_size.x = x;
 
 		return x;
@@ -112,6 +137,7 @@ namespace modui::ui
 		}
 
 		if (this->_current_screen) this->_current_screen->calculate_size_y(y);
+		if (this->_next_screen) this->_next_screen->calculate_size_y(y);
 		this->_calculated_size.y = y;
 
 		return y;

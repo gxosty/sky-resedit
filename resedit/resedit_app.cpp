@@ -22,46 +22,65 @@ namespace resedit
 			)
 		);
 
-		modui::Theme theme_dark("theme_dark");
+		modui::Theme theme_dark(0);
 
-		theme_dark().primary                   = MODUI_COLOR_HEX(0xFF'FFACED);
-		theme_dark().on_primary                = MODUI_COLOR_HEX(0xFF'5D0057);
-		theme_dark().primary_container         = MODUI_COLOR_HEX(0xFF'D100C5);
-		theme_dark().on_primary_container      = MODUI_COLOR_HEX(0xFF'FFFFFF);
+		theme_dark[modui::ThemeColor::Primary]                 = MODUI_COLOR_HEX(0xFF'FFACED);
+		theme_dark[modui::ThemeColor::OnPrimary]               = MODUI_COLOR_HEX(0xFF'5D0057);
+		theme_dark[modui::ThemeColor::PrimaryContainer]        = MODUI_COLOR_HEX(0xFF'D100C5);
+		theme_dark[modui::ThemeColor::OnPrimaryContainer]      = MODUI_COLOR_HEX(0xFF'FFFFFF);
 
-		theme_dark().secondary                 = MODUI_COLOR_HEX(0xFF'FFACED);
-		theme_dark().on_secondary              = MODUI_COLOR_HEX(0xFF'5D0057);
-		theme_dark().secondary_container       = MODUI_COLOR_HEX(0xFF'7C0074);
-		theme_dark().on_secondary_container    = MODUI_COLOR_HEX(0xFF'FFC9F0);
+		theme_dark[modui::ThemeColor::Secondary]               = MODUI_COLOR_HEX(0xFF'FFACED);
+		theme_dark[modui::ThemeColor::OnSecondary]             = MODUI_COLOR_HEX(0xFF'5D0057);
+		theme_dark[modui::ThemeColor::SecondaryContainer]      = MODUI_COLOR_HEX(0xFF'7C0074);
+		theme_dark[modui::ThemeColor::OnSecondaryContainer]    = MODUI_COLOR_HEX(0xFF'FFC9F0);
 
-		theme_dark().tertiary                  = MODUI_COLOR_HEX(0xFF'FFB3B2);
-		theme_dark().on_tertiary               = MODUI_COLOR_HEX(0xFF'680014);
-		theme_dark().tertiary_container        = MODUI_COLOR_HEX(0xFF'D83445);
-		theme_dark().on_tertiary_container     = MODUI_COLOR_HEX(0xFF'FFFFFF);
+		theme_dark[modui::ThemeColor::Tertiary]                = MODUI_COLOR_HEX(0xFF'FFB3B2);
+		theme_dark[modui::ThemeColor::OnTertiary]              = MODUI_COLOR_HEX(0xFF'680014);
+		theme_dark[modui::ThemeColor::TertiaryContainer]       = MODUI_COLOR_HEX(0xFF'D83445);
+		theme_dark[modui::ThemeColor::OnTertiaryContainer]     = MODUI_COLOR_HEX(0xFF'FFFFFF);
 
-		theme_dark().error                     = MODUI_COLOR_HEX(0xFF'FFB4AB);
-		theme_dark().on_error                  = MODUI_COLOR_HEX(0xFF'690005);
-		theme_dark().error_container           = MODUI_COLOR_HEX(0xFF'93000A);
-		theme_dark().on_error_container        = MODUI_COLOR_HEX(0xFF'FFDAD6);
+		theme_dark[modui::ThemeColor::Error]                   = MODUI_COLOR_HEX(0xFF'FFB4AB);
+		theme_dark[modui::ThemeColor::OnError]                 = MODUI_COLOR_HEX(0xFF'690005);
+		theme_dark[modui::ThemeColor::ErrorContainer]          = MODUI_COLOR_HEX(0xFF'93000A);
+		theme_dark[modui::ThemeColor::OnErrorContainer]        = MODUI_COLOR_HEX(0xFF'FFDAD6);
 
-		theme_dark().surface                   = MODUI_COLOR_HEX(0xFF'1C0F19);
-		theme_dark().on_surface                = MODUI_COLOR_HEX(0xFF'F5DCEB);
-		theme_dark().surface_variant           = MODUI_COLOR_HEX(0xFF'564051);
-		theme_dark().on_surface_variant        = MODUI_COLOR_HEX(0xFF'DDBED2);
-		theme_dark().surface_container_highest = MODUI_COLOR_HEX(0xFF'40303C);
-		theme_dark().surface_container_high    = MODUI_COLOR_HEX(0xFF'352531);
-		theme_dark().surface_container         = MODUI_COLOR_HEX(0xFF'291B26);
-		theme_dark().surface_container_low     = MODUI_COLOR_HEX(0xFF'251722);
-		theme_dark().surface_container_lowest  = MODUI_COLOR_HEX(0xFF'170A14);
-		theme_dark().inverse_surface           = MODUI_COLOR_HEX(0xFF'F5DCEB);
-		theme_dark().inverse_on_surface        = MODUI_COLOR_HEX(0xFF'3B2C37);
-		theme_dark().surface_tint              = MODUI_COLOR_HEX(0xFF'FFACED);
+		theme_dark[modui::ThemeColor::Surface]                 = MODUI_COLOR_HEX(0xFF'1C0F19);
+		theme_dark[modui::ThemeColor::OnSurface]               = MODUI_COLOR_HEX(0xFF'F5DCEB);
+		theme_dark[modui::ThemeColor::SurfaceVariant]          = MODUI_COLOR_HEX(0xFF'564051);
+		theme_dark[modui::ThemeColor::OnSurfaceVariant]        = MODUI_COLOR_HEX(0xFF'DDBED2);
+		theme_dark[modui::ThemeColor::SurfaceContainerHighest] = MODUI_COLOR_HEX(0xFF'40303C);
+		theme_dark[modui::ThemeColor::SurfaceContainerHigh]    = MODUI_COLOR_HEX(0xFF'352531);
+		theme_dark[modui::ThemeColor::SurfaceContainer]        = MODUI_COLOR_HEX(0xFF'291B26);
+		theme_dark[modui::ThemeColor::SurfaceContainerLow]     = MODUI_COLOR_HEX(0xFF'251722);
+		theme_dark[modui::ThemeColor::SurfaceContainerLowest]  = MODUI_COLOR_HEX(0xFF'170A14);
+		theme_dark[modui::ThemeColor::InverseSurface]          = MODUI_COLOR_HEX(0xFF'F5DCEB);
+		theme_dark[modui::ThemeColor::InverseOnSurface]        = MODUI_COLOR_HEX(0xFF'3B2C37);
+		theme_dark[modui::ThemeColor::SurfaceTint]             = MODUI_COLOR_HEX(0xFF'FFACED);
 
-		theme_dark().outline                   = MODUI_COLOR_HEX(0xFF'A4899C);
-		theme_dark().outline_variant           = MODUI_COLOR_HEX(0xFF'564051);
+		theme_dark[modui::ThemeColor::Outline]                 = MODUI_COLOR_HEX(0xFF'A4899C);
+		theme_dark[modui::ThemeColor::OutlineVariant]          = MODUI_COLOR_HEX(0xFF'564051);
+
+		modui::Theme theme_light(1);
 
 		this->get_theme_manager().add(theme_dark);
-		this->set_current_theme("theme_dark");
+		this->get_theme_manager().add(theme_light);
+		this->set_current_theme(0);
+
+		this->_theme_toggler = modui::ui::IconButton::init(modui::icons::ic_dark_mode_outline)
+			->set_toggleable(true)
+			->set_state(true)
+			->on_release(MODUI_CALLBACK(this) {
+				if (this_widget->get_state())
+				{
+					this->set_current_theme(0);
+				}
+				else
+				{
+					this->set_current_theme(1);
+				}
+			});
+
+		this->add_control_widget(_theme_toggler);
 	}
 
 	modui::ui::Widget* ResEditApp::build()

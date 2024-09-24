@@ -24,5 +24,6 @@ namespace resedit
 		static ResEditApp* instance;
 
 		modui::ui::ScreenManager* _screen_manager;
+		modui::ui::IconButton* _theme_toggler;
 	};
 }

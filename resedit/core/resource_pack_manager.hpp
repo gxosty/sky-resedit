@@ -112,6 +112,15 @@ namespace resedit::core
 		//     (uint64_t) The size of the asset if any resource pack modifies it, otherwise `asset_data.written_len`
 		uint64_t get_asset_size(const AssetData& asset_data);
 
+		// Gets highest priority `Edit` instance pointer of the asset if any
+		//
+		// Args:
+		//     asset_path: (const std::string&) The asset path
+		//
+		// Returns:
+		//     (const std::unique_ptr<Edit>&) `Edit` instance pointer of the asset if exists, otherwise `std::unique_ptr<nullptr>`
+		const std::unique_ptr<Edit>& get_asset_edit(const std::string& asset_path);
+
 	private:
 		std::vector<std::shared_ptr<ResourcePack>> _packs; // Vector of resource packs
 	};

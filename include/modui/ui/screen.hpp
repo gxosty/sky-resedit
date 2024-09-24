@@ -27,8 +27,10 @@ namespace modui::ui
 		float calculate_size_x(float bounding_box_size_x) override;
 		float calculate_size_y(float bounding_box_size_y) override;
 
+	public:
+		float alpha;
+
 	private:
 		std::string _name;
-
 	};
 }

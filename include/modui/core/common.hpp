@@ -5,6 +5,7 @@
 #include "exceptions.hpp"
 
 #include <functional>
+#include <cstdint>
 
 #define __MODUI_VERSION__ "0.1.0beta"
 
@@ -16,10 +17,11 @@ typedef ImVec4 Col4;
 
 namespace modui::image { class Image; }
 typedef modui::image::Image* ImageID;
+typedef uint32_t ThemeID;
 
 static constexpr char* DEFAULT_ID = (char*)"modui_id";
-static constexpr char* DEFAULT_THEME_LIGHT = (char*)"default_theme_light";
-static constexpr char* DEFAULT_THEME_DARK = (char*)"default_theme_dark";
+static constexpr ThemeID DEFAULT_THEME_LIGHT = 0x77777777;
+static constexpr ThemeID DEFAULT_THEME_DARK = 0x77777778;
 
 // tells that virtual functions exists just to not break the framework
 #define MODUI_VIRTUAL_PLACEHOLDER virtual
@@ -28,6 +30,7 @@ static constexpr char* DEFAULT_THEME_DARK = (char*)"default_theme_dark";
 
 #define MODUI_CALLBACK(...) [__VA_ARGS__](modui::ui::Widget* this_widget)
 #define MODUI_EMPTY_CALLBACK [](Widget*){}
+#define MODUI_ANIMATION_FINISH_CALLBACK(...) [__VA_ARGS__]()
 
 #define MODUI_SIZE_WRAP 0.0f
 #define MODUI_SIZE_WIDTH_WRAP MODUI_SIZE_WRAP
@@ -49,9 +52,57 @@ static constexpr char* DEFAULT_THEME_DARK = (char*)"default_theme_dark";
 namespace modui { class App; }
 namespace modui::ui { class Widget; }
 typedef std::function<void(modui::ui::Widget* this_widget)> ButtonInputCallback;
+typedef std::function<void(void)> AnimationFinishCallback;
 
 namespace modui
 {
+	// I like Material3 color convention
+	// even if I don't really understand them
+	enum class ThemeColor
+	{
+		Primary = 0,
+		OnPrimary,
+		PrimaryContainer,
+		OnPrimaryContainer,
+
+		Secondary,
+		OnSecondary,
+		SecondaryContainer,
+		OnSecondaryContainer,
+
+		Tertiary,
+		OnTertiary,
+		TertiaryContainer,
+		OnTertiaryContainer,
+
+		Error,
+		OnError,
+		ErrorContainer,
+		OnErrorContainer,
+
+		Surface,
+		OnSurface,
+		SurfaceVariant,
+		OnSurfaceVariant,
+		SurfaceContainerHighest,
+		SurfaceContainerHigh,
+		SurfaceContainer,
+		SurfaceContainerLow,
+		SurfaceContainerLowest,
+		InverseSurface,
+		InverseOnSurface,
+		SurfaceTint,
+
+		Outline,
+		OutlineVariant,
+
+		#ifdef MODUI_CUSTOM_THEME_COLORS
+			MODUI_CUSTOM_THEME_COLORS
+		#endif
+
+		ThemeColorSize
+	};
+
 	enum Side {
 		SIDE_TOP,
 		SIDE_TOP_RIGHT,
@@ -84,6 +135,7 @@ namespace modui
 		static inline float clamp(float value, float minv, float maxv) { return (value < minv) ? minv : (value > maxv) ? maxv : value; }
 
 		static inline float map(float value, float a_min, float a_max, float b_min, float b_max) { return (value - a_min) * (b_max - b_min) / (a_max - a_min) + b_min; }
+		static inline uint64_t map(uint64_t value, uint64_t a_min, uint64_t a_max, uint64_t b_min, uint64_t b_max) { return (value - a_min) * (b_max - b_min) / (a_max - a_min) + b_min; }
 	}
 }
 

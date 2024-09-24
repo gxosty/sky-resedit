@@ -15,10 +15,10 @@ namespace resedit::asset_manager_hook
 	extern int     (*aasset_is_allocated_orig)(AAsset* asset);
 
 	void set_asset_read_callback(
-		std::function<uint64_t(AAsset*, const std::string&, char* buffer, uint64_t)> callback);
+		std::function<uint64_t(AAsset*, const std::string&, bool, char*, uint64_t)> callback);
 
 	void set_asset_get_length_callback(
-		std::function<off_t(AAsset*, const std::string&)> callback);
+		std::function<off_t(AAsset*, const std::string&, bool)> callback);
 
 	void apply_hooks();
 	void restore_hooks();

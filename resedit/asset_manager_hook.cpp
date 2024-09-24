@@ -1,28 +1,50 @@
 #include "asset_manager_hook.hpp"
+#include "core/resource_pack_manager.hpp"
+
+#include <misc/Logger.h>
 
 #include <Dobby/dobby.h>
 
 #include <unordered_map>
 #include <string>
 
+namespace resedit
+{
+	extern core::ResourcePackManager _resource_pack_manager;
+}
+
 namespace resedit::asset_manager_hook
 {
-	std::function<uint64_t(AAsset*, const std::string&, char* buffer, uint64_t)> _asset_read_callback;
-	std::function<off_t(AAsset*, const std::string&)> _asset_get_length_callback;
+	std::function<uint64_t(AAsset*, const std::string&, bool, char*, uint64_t)> _asset_read_callback;
+	std::function<off_t(AAsset*, const std::string&, bool)> _asset_get_length_callback;
 
 	thread_local std::unordered_map<AAsset*, std::string> asset_filenames;
+	thread_local std::unordered_map<AAsset*, std::string> injected_asset_filenames;
+	thread_local uintptr_t injected_aasset_ptr = 0x15125; // random starting number
 
 	AAsset* (*aassetmanager_open_orig)(AAssetManager* mgr, const char* filename, int mode) = nullptr;
 	AAsset* _aassetmanager_open_hook(AAssetManager* mgr, const char* filename, int mode)
 	{
 		AAsset* asset = aassetmanager_open_orig(mgr, filename, mode);
+		std::string str_filename = std::string(filename);
 
 		if (asset)
 		{
-			std::string str_filename = std::string(filename);
-
 			if (!str_filename.empty())
 				asset_filenames[asset] = str_filename;
+		}
+		else
+		{
+			if (resedit::_resource_pack_manager.any_edit_for_asset(str_filename))
+			{
+				LOGI("Opening fake AAsset* for injected asset: %s", filename);
+				asset = (AAsset*)injected_aasset_ptr++;
+				injected_asset_filenames[asset] = str_filename;
+			}
+			else
+			{
+				LOGI("Couldn't AAssetManager_open -> %s", filename);
+			}
 		}
 
 		return asset;
@@ -33,7 +55,11 @@ namespace resedit::asset_manager_hook
 	{
 		if (_asset_read_callback && asset_filenames.contains(asset))
 		{
-			return _asset_read_callback(asset, asset_filenames[asset], (char*)buf, count);
+			return _asset_read_callback(asset, asset_filenames[asset], false, (char*)buf, count);
+		}
+		else if (_asset_read_callback && injected_asset_filenames.contains(asset))
+		{
+			return _asset_read_callback(asset, injected_asset_filenames[asset], true, (char*)buf, count);
 		}
 
 		return aasset_read_orig(asset, buf, count);
@@ -46,6 +72,11 @@ namespace resedit::asset_manager_hook
 		{
 			asset_filenames.erase(asset);
 		}
+		else if (injected_asset_filenames.contains(asset))
+		{
+			injected_asset_filenames.erase(asset);
+			return;
+		}
 
 		aasset_close_orig(asset);
 	}
@@ -55,7 +86,11 @@ namespace resedit::asset_manager_hook
 	{
 		if (_asset_get_length_callback && asset_filenames.contains(asset))
 		{
-			return _asset_get_length_callback(asset, asset_filenames[asset]);
+			return _asset_get_length_callback(asset, asset_filenames[asset], false);
+		}
+		else
+		{
+			return _asset_get_length_callback(asset, injected_asset_filenames[asset], true);
 		}
 
 		return aasset_get_length_orig(asset);
@@ -69,13 +104,13 @@ namespace resedit::asset_manager_hook
 	}
 
 	void set_asset_read_callback(
-		std::function<uint64_t(AAsset*, const std::string&, char* buffer, uint64_t)> callback)
+		std::function<uint64_t(AAsset*, const std::string&, bool, char* buffer, uint64_t)> callback)
 	{
 		_asset_read_callback = callback;
 	}
 
 	void set_asset_get_length_callback(
-		std::function<off_t(AAsset*, const std::string&)> callback)
+		std::function<off_t(AAsset*, const std::string&, bool)> callback)
 	{
 		_asset_get_length_callback = callback;
 	}

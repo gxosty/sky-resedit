@@ -11,7 +11,7 @@ void Menu(bool *_pOpen);
 void Init();
 extern "C" void __attribute__((visibility("default"))) InitLate();
 
-extern "C" func __attribute__((visibility ("default"))) Start() {
+extern "C" func __attribute__((visibility("default"))) Start() {
     Init();
     return &Menu;
 }

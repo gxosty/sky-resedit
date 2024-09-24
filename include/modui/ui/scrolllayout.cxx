@@ -32,9 +32,9 @@ namespace modui::ui
 			ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, utils::dp(3));
 			ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarRounding, FLT_MAX);
 			ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, 0);
-			ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, theme().secondary);
-			ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, theme().secondary);
-			ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, theme().secondary);
+			ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, theme(ThemeColor::Secondary));
+			ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, theme(ThemeColor::Secondary));
+			ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, theme(ThemeColor::Secondary));
 			ImGui::PushStyleColor(ImGuiCol_ChildBg, 0);
 			bool opened = ImGui::BeginChild(DEFAULT_ID, this->_calculated_size, 0,
 				  ImGuiWindowFlags_NoTitleBar

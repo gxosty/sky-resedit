@@ -119,10 +119,11 @@ namespace resedit::core
 		const std::string& asset_path,
 		const std::filesystem::path& file_path,
 		int repeat,
+		bool is_injected,
 		const std::string& compare_key,
 		const std::string& path_to_object_in_asset,
 		const std::string& path_to_object_in_file
-	) : Edit(asset_path, file_path, repeat),
+	) : Edit(asset_path, file_path, repeat, is_injected),
 		_compare_key{compare_key},
 		_path_to_object_in_asset{path_to_object_in_asset},
 		_path_to_object_in_file{path_to_object_in_file} {}

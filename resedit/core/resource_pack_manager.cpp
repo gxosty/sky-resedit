@@ -4,6 +4,8 @@
 
 namespace resedit::core
 {
+	static std::unique_ptr<Edit> _null_edit(nullptr);
+
 	std::weak_ptr<ResourcePack> ResourcePackManager::create(const std::filesystem::path& resource_pack_path)
 	{
 		return _packs.emplace_back(std::make_shared<ResourcePack>(resource_pack_path));
@@ -39,7 +41,7 @@ namespace resedit::core
 			this->remove(idx);
 		}
 	}
-	
+
 	size_t ResourcePackManager::move(size_t idx, MoveDirection direction)
 	{
 		if (((direction == MoveDirection::Up) && (idx == 0))
@@ -108,5 +110,23 @@ namespace resedit::core
 		}
 
 		return *asset_data.written_len;
+	}
+
+	const std::unique_ptr<Edit>& ResourcePackManager::get_asset_edit(const std::string& asset_path)
+	{
+		if (_packs.empty()) return _null_edit;
+
+		for (auto pack_it = _packs.end() - 1; pack_it >= _packs.begin(); pack_it--)
+		{
+			for (auto& edit : (*pack_it)->_edits)
+			{
+				if (edit->matches(asset_path))
+				{
+					return edit;
+				}
+			}
+		}
+
+		return _null_edit;
 	}
 }

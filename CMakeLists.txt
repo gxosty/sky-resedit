@@ -89,7 +89,7 @@ add_compile_definitions(MODUI_EMBED_ICONS=1)
 add_library( # Sets the name of the library.
 	${CUR_NAME}
 	SHARED
-	
+
 	resedit/asset_manager_hook.cpp
 	resedit/main.cpp
 	resedit/config.cpp
@@ -113,18 +113,25 @@ add_library( # Sets the name of the library.
 	# ModUI
 	include/stb/stb_image.cpp
 
+	include/modui/animation/animation.cxx
+	include/modui/animation/screen/screenanimation.cxx
+	include/modui/animation/screen/fadescreenanimation.cxx
+	include/modui/animation/theme/themetransitionanimation.cxx
+
 	include/modui/core/image/image.cxx
 	include/modui/core/image/rasterimage.cxx
 	include/modui/core/image/selectableimage.cxx
 	include/modui/core/image/vectoricon.cxx
 	include/modui/core/image/vectorimage.cxx
-
+	include/modui/core/style/theme.cxx
+	include/modui/core/style/thememanager.cxx
 	include/modui/core/common.cxx
 	include/modui/core/exceptions.cxx
 
 	include/modui/internal/internal_core.cxx
 	include/modui/internal/internal_utils.cxx
 
+	include/modui/ui/appbar.cxx
 	include/modui/ui/basebutton.cxx
 	include/modui/ui/baseslider.cxx
 	include/modui/ui/button.cxx
@@ -135,6 +142,7 @@ add_library( # Sets the name of the library.
 	include/modui/ui/linearlayout.cxx
 	include/modui/ui/listitem.cxx
 	include/modui/ui/memorytext.cxx
+	include/modui/ui/menu.cxx
 	include/modui/ui/screen.cxx
 	include/modui/ui/screenmanager.cxx
 	include/modui/ui/scrolllayout.cxx
@@ -144,7 +152,6 @@ add_library( # Sets the name of the library.
 	include/modui/ui/widget.cxx
 
 	include/modui/icons.cxx
-	include/modui/theme.cxx
 	include/modui/app.cxx
 )
 

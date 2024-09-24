@@ -16,10 +16,10 @@ namespace modui::ui
 		_spacing{0.0f, 0.0f},
 		_root_widget{nullptr},
 		_built{false},
-		_clickable{false}
+		_clickable{false},
+		_theme{nullptr}
 		{
 			modui::App* app = modui::get_current_app();
-			this->_theme = &app->_current_theme;
 			this->_calculated_size = _size;
 		};
 
@@ -150,7 +150,12 @@ namespace modui::ui
 
 	Theme& Widget::get_theme()
 	{
-		return **this->_theme;
+		if (!this->_theme)
+		{
+			return modui::get_current_app()->get_current_theme();
+		}
+
+		return *this->_theme;
 	}
 
 	void Widget::pre_render()
@@ -179,7 +184,7 @@ namespace modui::ui
 #ifdef MODUI_SHOW_BOUNDING_BOXES
 	void Widget::render_bounding_box()
 	{
-		ImGui::GetWindowDrawList()->AddRect(this->_pos, this->_pos + this->_calculated_size, this->get_theme()().inverse_surface);
+		ImGui::GetWindowDrawList()->AddRect(this->_pos, this->_pos + this->_calculated_size, this->get_theme()(ThemeColor::INVERSE_SURFACE));
 	}
 #endif
 

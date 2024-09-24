@@ -74,14 +74,14 @@ namespace modui::ui
 
 		if (this->_state)
 		{
-			col1 = theme().primary;
+			col1 = theme(ThemeColor::Primary);
 		}
 		else
 		{
-			col1 = theme().on_surface_variant;
+			col1 = theme(ThemeColor::OnSurfaceVariant);
 		}
 
-		Col32 ripple_color = (col1 & 0xFFFFFF) | (unsigned(0xFF * this->_press_factor * 0.1f) << 24);
+		Col32 ripple_color = Color(col1).get_alpha_applied(Theme::global_alpha * this->_press_factor * 0.1f);
 		Vec2 ripple_pos = pos + (size - __button_size) / 2.0f;
 
 		draw_list->AddRectFilled(
@@ -193,13 +193,13 @@ namespace modui::ui
 
 		if (this->_state)
 		{
-			col1 = theme().primary;
-			col2 = theme().on_primary;
+			col1 = theme(ThemeColor::Primary);
+			col2 = theme(ThemeColor::OnPrimary);
 		}
 		else
 		{
-			col1 = theme().surface_container_highest;
-			col2 = theme().primary;
+			col1 = theme(ThemeColor::SurfaceContainerHighest);
+			col2 = theme(ThemeColor::Primary);
 		}
 
 		Col32 fill_color = col1;
@@ -264,13 +264,13 @@ namespace modui::ui
 
 		if (this->_state)
 		{
-			col1 = theme().secondary_container;
-			col2 = theme().on_secondary_container;
+			col1 = theme(ThemeColor::SecondaryContainer);
+			col2 = theme(ThemeColor::OnSecondaryContainer);
 		}
 		else
 		{
-			col1 = theme().surface_container_highest;
-			col2 = theme().on_surface_variant;
+			col1 = theme(ThemeColor::SurfaceContainerHighest);
+			col2 = theme(ThemeColor::OnSurfaceVariant);
 		}
 
 		Col32 fill_color = col1;
@@ -336,15 +336,15 @@ namespace modui::ui
 
 		if (this->_state)
 		{
-			col1 = theme().inverse_surface;
-			col2 = theme().inverse_on_surface;
+			col1 = theme(ThemeColor::InverseSurface);
+			col2 = theme(ThemeColor::InverseOnSurface);
 			col3 = 0x0;
 		}
 		else
 		{
 			col1 = 0x0;
-			col2 = theme().on_surface_variant;
-			col3 = theme().outline;
+			col2 = theme(ThemeColor::OnSurfaceVariant);
+			col3 = theme(ThemeColor::Outline);
 		}
 
 		Col32 fill_color = col1;

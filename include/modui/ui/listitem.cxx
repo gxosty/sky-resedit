@@ -27,6 +27,7 @@ namespace modui::ui
 		_trailing_text_font_size{ImGui::GetFontSize() * 0.785f}
 	{
 		this->_size = Vec2(MODUI_SIZE_WIDTH_FULL, MODUI_SIZE_HEIGHT_WRAP);
+		this->_spacing = Vec2{utils::dp(16), 0.0f};
 		this->set_text(text);
 		this->set_supporting_text(supporting_text);
 		this->set_trailing_text(trailing_text);
@@ -178,21 +179,21 @@ namespace modui::ui
 		const float text_wrap = trailing ? trailing_pos.x - utils::dp(16) - text_pos.x : 0.0f;
 		const float text_clip = trailing ? text_wrap : pos.x + size.x - utils::dp(16) - text_pos.x;
 
-		Col32 container_fill_color = theme().surface;
-		Col32 leading_icon_color = (theme().on_surface_variant & 0xFFFFFF);
-		Col32 text_color = (theme().on_surface & 0xFFFFFF);
-		Col32 supporting_text_color = theme().on_surface_variant;
-		Col32 ripple_color = (theme().on_surface & 0xFFFFFF) | (unsigned(0xFF * this->_press_factor * 0.1f) << 24);
+		Col32 container_fill_color = theme(ThemeColor::Surface);
+		Col32 supporting_text_color = theme(ThemeColor::OnSurfaceVariant);
+		Col32 ripple_color = theme[ThemeColor::OnSurface].get_alpha_applied(Theme::global_alpha * this->_press_factor * 0.1f);
+		Col32 leading_icon_color;
+		Col32 text_color;
 
 		if (this->_state)
 		{
-			text_color |= unsigned(0xFF) << 24;
-			leading_icon_color |= unsigned(0xFF) << 24;
+			text_color = theme(ThemeColor::OnSurface);
+			leading_icon_color = theme(ThemeColor::OnSurfaceVariant);
 		}
 		else
 		{
-			text_color |= unsigned(0x61) << 24;
-			leading_icon_color |= unsigned(0x61) << 24;
+			text_color = theme[ThemeColor::OnSurface].get_alpha_applied(Theme::global_alpha * 0.38f);
+			leading_icon_color = theme[ThemeColor::OnSurfaceVariant].get_alpha_applied(Theme::global_alpha * 0.38f);
 		}
 
 		if (this->_leading_icon != nullptr)
@@ -233,7 +234,7 @@ namespace modui::ui
 	float ListItem::get_wrapped_size_x()
 	{
 		bool anything_before = false;
-		float x = utils::dp(16) * 2.0f;
+		float x = this->_spacing.x * 2.0f;
 
 		if (this->_leading_icon != nullptr)
 		{
@@ -244,7 +245,7 @@ namespace modui::ui
 
 		if (!this->_text.empty())
 		{
-			if (anything_before) x += utils::dp(16);
+			if (anything_before) x += this->_spacing.x;
 
 			x += this->_text_size.x;
 			anything_before = true;
@@ -252,7 +253,7 @@ namespace modui::ui
 
 		if (!this->_supporting_text.empty())
 		{
-			if (this->_text.empty() && anything_before) x += utils::dp(16);
+			if (this->_text.empty() && anything_before) x += this->_spacing.x;
 
 			x += fmax(this->_supporting_text_size.x - this->_text_size.x, 0.0f);
 			anything_before = true;
@@ -260,12 +261,12 @@ namespace modui::ui
 
 		if (this->_trailing_widget != nullptr)
 		{
-			if (anything_before) x += utils::dp(16);
+			if (anything_before) x += this->_spacing.x;
 			x += this->_trailing_widget->get_calculated_size().x; // widget width should be WRAP
 		}
 		else if (!this->_trailing_text.empty())
 		{
-			if (anything_before) x += utils::dp(16);
+			if (anything_before) x += this->_spacing.x;
 			x += this->_trailing_text_size.x;
 		}
 

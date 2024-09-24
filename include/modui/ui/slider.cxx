@@ -50,20 +50,20 @@ namespace modui::ui
 		);
 
 		Col4 fill_color = utils::mix(
-			utils::Col32to4(theme().primary),
+			utils::Col32to4(theme(ThemeColor::Primary)),
 			utils::add_button_pressed_layer(
-				utils::Col32to4(theme().primary),
-				utils::Col32to4(theme().on_primary)
+				utils::Col32to4(theme(ThemeColor::Primary)),
+				utils::Col32to4(theme(ThemeColor::OnPrimary))
 			),
 			this->_press_factor
 		);
 
-		Col32 ripple_color = (theme().primary & 0xFFFFFF) | (unsigned(0xFF * this->_press_factor * 0.1f) << 24);
+		Col32 ripple_color = theme[ThemeColor::Primary].get_alpha_applied(Theme::global_alpha * this->_press_factor * 0.1f);
 
 		draw_list->AddRectFilled(Vec2(slider_x - __ripple_radius, center_y - __ripple_radius), Vec2(slider_x + __ripple_radius, center_y + __ripple_radius), ripple_color, 99999.0f);
-		draw_list->AddRectFilled(l1_p1, l1_p2, theme().primary, MODUI_ROUNDING_FULL);
-		draw_list->AddRectFilled(l2_p1, l2_p2, (theme().primary & 0xFFFFFF) | 0x61000000, MODUI_ROUNDING_FULL);
-		draw_list->AddCircleFilled(Vec2(slider_x, center_y), __circle_radius, theme().primary);
+		draw_list->AddRectFilled(l1_p1, l1_p2, theme(ThemeColor::Primary), MODUI_ROUNDING_FULL);
+		draw_list->AddRectFilled(l2_p1, l2_p2, theme[ThemeColor::Primary].get_alpha_applied(Theme::global_alpha * 0.38f), MODUI_ROUNDING_FULL);
+		draw_list->AddCircleFilled(Vec2(slider_x, center_y), __circle_radius, theme(ThemeColor::Primary));
 	}
 
 	float Slider::get_wrapped_size_x()

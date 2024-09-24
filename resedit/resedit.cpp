@@ -28,10 +28,10 @@ namespace resedit
 
 	Config _config(io::get_config_path());
 	core::ResourcePackManager _resource_pack_manager;
-	
+
 	CipherBase* _vfs_readfile_cipher_hook = nullptr;
 
-	uint64_t asset_read(AAsset* asset, const std::string& asset_path, char* buffer, uint64_t max_len)
+	uint64_t asset_read(AAsset* asset, const std::string& asset_path, bool is_injected, char* buffer, uint64_t max_len)
 	{
 		if (_state == State::NotInitialized)
 		{
@@ -46,65 +46,94 @@ namespace resedit
 
 		if (_resource_pack_manager.any_edit_for_asset(asset_path))
 		{
-			auto asset_size = asset_manager_hook::aasset_get_length_orig(asset);
-			uint64_t written_len = 0;
-			uint64_t inner_buffer_size = fmax(asset_size, max_len);
-			char* inner_buffer = new char[inner_buffer_size];
-			inner_buffer[asset_size-1] = 0;
-
-			if (!asset_path.starts_with("RE_"))
+			if (!is_injected)
 			{
+				auto asset_size = asset_manager_hook::aasset_get_length_orig(asset);
+				uint64_t written_len = 0;
+				uint64_t inner_buffer_size = fmax(asset_size, max_len);
+				char* inner_buffer = new char[inner_buffer_size];
+				inner_buffer[asset_size-1] = 0;
 				written_len = asset_manager_hook::aasset_read_orig(asset, (void*)inner_buffer, inner_buffer_size);
+
+				AssetData asset_data{
+					asset_path,
+					inner_buffer,
+					inner_buffer_size,
+					&written_len
+				};
+
+				if (_resource_pack_manager.edit_asset(asset_data))
+				{
+					LOGI("Modified: %s", asset_path.c_str());
+					memcpy(buffer, (void*)inner_buffer, written_len);
+				}
+
+				delete[] inner_buffer;
+
+				return written_len;
 			}
 			else
 			{
-				LOGI("Found injected asset: %s", asset_path.c_str());
+				uint64_t written_len = 0;
+
+				AssetData asset_data{
+					asset_path,
+					buffer,
+					max_len,
+					&written_len
+				};
+
+				if (_resource_pack_manager.edit_asset(asset_data))
+				{
+					LOGI("Injected: %s", asset_path.c_str());
+				}
+
+				return written_len;
 			}
-
-			AssetData asset_data{
-				asset_path,
-				inner_buffer,
-				inner_buffer_size,
-				&written_len
-			};
-
-			if (_resource_pack_manager.edit_asset(asset_data))
-			{
-				LOGI("Modified: %s", asset_path.c_str());
-				memcpy(buffer, (void*)inner_buffer, written_len);
-			}
-
-			delete[] inner_buffer;
-
-			return written_len;
 		}
 
 		return asset_manager_hook::aasset_read_orig(asset, buffer, max_len);
 	}
 
-	off_t asset_get_length(AAsset* asset, const std::string& asset_path)
+	off_t asset_get_length(AAsset* asset, const std::string& asset_path, bool is_injected)
 	{
-		auto asset_size = asset_manager_hook::aasset_get_length_orig(asset);
+		auto asset_size =
+			(!is_injected ? asset_manager_hook::aasset_get_length_orig(asset) : 0);
 
 		if (_resource_pack_manager.any_edit_for_asset(asset_path))
 		{
-			uint64_t max_len = pow(2, (ceil(log2(asset_size))));
-			char* buffer = new char[max_len];
-			buffer[max_len-1] = 0;
-			AAsset_seek(asset, 0, SEEK_SET);
-			uint64_t written_len = asset_manager_hook::aasset_read_orig(asset, (void*)buffer, max_len);
-			AAsset_seek(asset, 0, SEEK_SET);
+			if (!is_injected)
+			{
+				uint64_t max_len = pow(2, (ceil(log2(asset_size))));
+				char* buffer = new char[max_len];
+				buffer[max_len-1] = 0;
+				AAsset_seek(asset, 0, SEEK_SET);
+				uint64_t written_len = asset_manager_hook::aasset_read_orig(asset, (void*)buffer, max_len);
+				AAsset_seek(asset, 0, SEEK_SET);
 
-			AssetData asset_data{
-				asset_path,
-				buffer,
-				max_len,
-				&written_len
-			};
+				AssetData asset_data{
+					asset_path,
+					buffer,
+					max_len,
+					&written_len
+				};
 
-			asset_size = _resource_pack_manager.get_asset_size(asset_data);
+				asset_size = _resource_pack_manager.get_asset_size(asset_data);
 
-			delete[] buffer;
+				delete[] buffer;
+			}
+			else
+			{
+				uint64_t written_len = 0;
+				AssetData asset_data{
+					asset_path,
+					nullptr,
+					0,
+					&written_len
+				};
+
+				asset_size = _resource_pack_manager.get_asset_size(asset_data);
+			}
 		}
 
 		return asset_size;

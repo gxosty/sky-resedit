@@ -101,6 +101,7 @@ add_library( # Sets the name of the library.
 	# Core components
 	resedit/core/resource_pack_manager.cpp
 	resedit/core/resource_pack.cpp
+	resedit/core/append_edit.cpp
 	resedit/core/replace_edit.cpp
 	resedit/core/json_edit.cpp
 

@@ -101,11 +101,11 @@ namespace resedit::core
 
 	uint64_t ResourcePackManager::get_asset_size(const AssetData& asset_data)
 	{
-		for (auto& pack : _packs)
+		for (auto pack_it = _packs.end() - 1; pack_it >= _packs.begin(); pack_it--)
 		{
-			if (pack->any_edit_for_asset(asset_data.path))
+			if ((*pack_it)->is_enabled() && (*pack_it)->any_edit_for_asset(asset_data.path))
 			{
-				return pack->get_asset_size(asset_data);
+				return (*pack_it)->get_asset_size(asset_data);
 			}
 		}
 

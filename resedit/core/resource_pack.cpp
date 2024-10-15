@@ -1,5 +1,7 @@
 #include "resource_pack.hpp"
 #include "exceptions.hpp"
+
+#include "append_edit.hpp"
 #include "replace_edit.hpp"
 #include "json_edit.hpp"
 
@@ -89,6 +91,18 @@ namespace resedit::core
 							path_to_object_in_file
 						);
 
+					this->add_edit(std::move(edit));
+				}
+				else if (edit_type_str == "append")
+				{
+					if (is_injected)
+					{
+						LOGW("[%s:%s] | Cannot inject assets (`is_injected == true`) when `edit_type` field is \"AppendEdit\"",
+							_name.c_str(), idx_str.c_str());
+						continue;
+					}
+
+					std::unique_ptr<Edit> edit = std::make_unique<AppendEdit>(asset, file_path, repeat, is_injected);
 					this->add_edit(std::move(edit));
 				}
 

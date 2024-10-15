@@ -119,6 +119,9 @@ namespace resedit::core
 
 	bool ResourcePack::any_edit_for_asset(const std::string& asset_path)
 	{
+		if (!_enabled)
+			return false;
+
 		for (auto& edit : _edits)
 		{
 			if (edit->matches(asset_path))
